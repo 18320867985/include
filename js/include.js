@@ -1,6 +1,7 @@
 (function() {
 
 	/*创建include对象*/
+	var _include = window.include
 	var include = window.include = function(selector, content) {
 
 	};
