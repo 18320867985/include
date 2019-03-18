@@ -238,12 +238,14 @@
 
 	function includeHtml() {
 		var _htmls = document.getElementsByTagName("include");
+		
 		for(var i = 0; i < _htmls.length; i++) {
 
 			(function(obj) {
 
 				var src = obj.getAttribute("src");
 				var prop = obj.getAttribute("obj") || "";
+				
 				if(prop) {
 					prop = JSON.parse(prop)
 				} else {
@@ -259,6 +261,18 @@
 						//obj.outerHTML = data;
 						parent.replaceChild(newElement, obj);
 					}
+					
+					var index = obj.getAttribute("index") || "";
+					var isHead=obj.hasAttribute("header");
+					if(isHead){
+						 if(!isNaN(index)){
+							 index=window.parseInt(index);
+							console.log(index);
+							$("header .nav li").removeClass("active");
+							$("header .nav li").eq(index).addClass("active");
+						 }
+					}
+				
 
 				});
 			})(_htmls[i])
