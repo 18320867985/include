@@ -1,20 +1,26 @@
-(function() {
+
+/*
+ author
+ hqs
+ */
+
+(function () {
 
 	/*创建include对象*/
-	var _include = window.include
+    var _include = window.include;
 	var include = window.include = function(selector, content) {
 
 	};
 
-	include.extend = function(obj) {
-		if(typeof obj === "object") {
-			for(var i in obj) {
-				this[i] = obj[i];
-			}
-		}
+    include.extend = function (obj) {
+        if (typeof obj === "object") {
+            for (var i in obj) {
+                this[i] = obj[i];
+            }
+        }
 
-		return this;
-	}
+        return this;
+    };
 
 	// ajax type
 	function _ajaxFun(url, type, data, _arguments) {
@@ -46,48 +52,100 @@
 
 	}
 
-	// 链接ajax发送的参数数据
-	function _JoinParams(data) {
-		// 参数data对象字符
-		var params = [];
+    // 链接ajax发送的参数数据
+    function _JoinParams(data) {
 
-		for(var key in data) {
+        var params = [];
+        if (data instanceof Object) {
+            _compilerparams(params, data, "");
+        }
+        return params.join("&") || "";
 
-			if(typeof data[key] === "object") {
-				var data2 = data[key];
-				// object
-				if(data[key].constructor !== Array) {
-					for(var key2 in data2) {
-						var _key = key + "[" + key2 + "]";
-						var _value = data2[key2];
-						params.push(encodeURIComponent(_key) + '=' + encodeURIComponent(_value));
-					}
-				} else {
-					for(var key2 in data2) {
+    }
 
-						var data3 = data2[key2];
-						if(typeof data3 === "object" && data3.constructor !== Array) {
-							for(var key3 in data3) {
-								var _key = key + "[" + key2 + "]" + "[" + key3 + "]";
-								var _value = data3[key3];
-								params.push(encodeURIComponent(_key) + '=' + encodeURIComponent(_value));
+    function _compilerparams(params, data, preKey) {
+        preKey = preKey || "";
 
-							}
-						}
+        for (var key in data) {
+            var data2 = data[key];
 
-					}
-				}
-			} else {
-				params.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-			}
+            if (data2 === undefined) {
+                continue;
+            }
 
-		}
+            else if (data2 !== null && data2.constructor === Object) {
+                for (var key2 in data2) {
 
-		return params.join("&") || "";
+                    var _key = "";
+                    var _key2 = "[" + key2 + "]";
+                    if (preKey === "") {
+                        _key = preKey + key + _key2;
+                    } else {
+                        _key = preKey + "[" + key + "]" + _key2;
+                    }
 
-	}
+                    var _value = data2[key2];
 
-	include.extend({
+                    if (_value.constructor === Array || _value.constructor === Object) {
+
+                        _compilerparams(params, _value, _key);
+                    } else {
+                        params.push(encodeURIComponent(_key) + '=' + encodeURIComponent(_value));
+                    }
+
+                }
+            }
+
+            else if (data2 !== null && data2.constructor === Array) {
+
+                for (var key2_ in data2) {
+                    var data3 = data2[key2_];
+                    if (typeof data3 === "object") {
+                        for (var key3 in data3) {
+
+                            var _key_ = "";
+                            var _key2_ = "[" + key2_ + "]" + "[" + key3 + "]";
+                            if (preKey === "") {
+                                _key_ = preKey + key + _key2_;
+                            } else {
+                                _key_ = preKey + "[" + key + "]" + _key2_;
+                            }
+
+                            var _value_ = data3[key3];
+
+                            if (_value_.constructor === Array || _value_.constructor === Object) {
+
+                                _compilerparams(params, _value_, _key_);
+                            } else {
+                                params.push(encodeURIComponent(_key_) + '=' + encodeURIComponent(_value_));
+                            }
+
+                        }
+                    } else {
+                        var _key_2 = preKey + key + "[]";
+                        var _value_2 = data3;
+                        params.push(encodeURIComponent(_key_2) + '=' + encodeURIComponent(_value_2));
+                    }
+
+                }
+
+            } else {
+                var _key_3 = "";
+                if (preKey === "") {
+                    _key_3 = preKey + key;
+                } else {
+                    _key_3 = preKey + "[" + key + "]";
+                }
+                var dataVal = data[key];
+                dataVal = dataVal === null ? "" : dataVal;
+                params.push(encodeURIComponent(_key_3) + '=' + encodeURIComponent(dataVal));
+
+            }
+
+        }
+    }
+
+    include.extend({
 
 		// create XHR Object
 		createXHR: function() {
@@ -103,7 +161,7 @@
 				for(var i = 0, len = versions.length; i < len; i++) {
 					try {
 						return new ActiveXObject(version[i]);
-						break;
+					
 					} catch(e) {
 						//跳过
 					}
@@ -120,7 +178,7 @@
 				 @param {boolean}opt.async 是否为异步请求，true为异步的，false为同步的
 				 @param {object}opt.data 发送的参数，格式为对象类型
 				 @param {function}opt.contentType   内容类型
-				@param {function}opt.success ajax发送并接收成功调用的回调函数
+				 @param {function}opt.success ajax发送并接收成功调用的回调函数
 				 @param {function}opt.error ajax发送并接收error调用的回调函数
 				 @param {function}opt.getXHR 获取xhr对象
 				 @param {number}opt.timeout // 超时
@@ -140,7 +198,7 @@
 
 			var xhr = include.createXHR();
 			if(typeof opt.timeout === "number") {
-				xhr.timeout = opt.timeout
+                xhr.timeout = opt.timeout;
 			}
 
 			xhr.xhrFields = opt.xhrFields || {};
@@ -191,12 +249,6 @@
 		get: function(url, data) {
 			_ajaxFun(url, "get", data, arguments);
 		},
-
-		// post
-		post: function(url, data) {
-			_ajaxFun(url, "post", data, arguments);
-		},
-
 		// html字符串转dom对象
 		htmlStringToDOM: function(txt) {
 
@@ -218,7 +270,7 @@
 			df = null;
 			return df2;
 
-		},
+		}
 
 	});
 
@@ -231,9 +283,9 @@
 			includeHtml();
 		});
 	} else {
-		window.onload = function() {
-			includeHtml();
-		}
+        window.attachEvent("onload", function () {
+            includeHtml();
+        });
 	}
 
 	function includeHtml() {
@@ -241,41 +293,38 @@
 		
 		for(var i = 0; i < _htmls.length; i++) {
 
-			(function(obj) {
+            (function (obj) {
 
-				var src = obj.getAttribute("src");
-				var prop = obj.getAttribute("obj") || "";
-				
-				if(prop) {
-					prop = JSON.parse(prop)
-				} else {
-					prop = {};
-				}
-				include.get(src, prop, function(data) {
-					var parent = obj.parentNode;
-					var newElement = include.htmlStringToDOM(data);
-					if(obj.addEventListener) {
-						parent.replaceChild(newElement, obj);
-						//obj.innerHTML = data;
-					} else if(obj.outerHTML) {
-						//obj.outerHTML = data;
-						parent.replaceChild(newElement, obj);
-					}
-					
-					var index = obj.getAttribute("index") || "";
-					var isHead=obj.hasAttribute("header");
-					if(isHead){
-						 if(!isNaN(index)){
-							 index=window.parseInt(index);
-							console.log(index);
-							$("header .nav li").removeClass("active");
-							$("header .nav li").eq(index).addClass("active");
-						 }
-					}
-				
+                var src = obj.getAttribute("src");
+                var prop = obj.getAttribute("obj") || "";
 
-				});
-			})(_htmls[i])
+                if (prop) {
+                    prop = JSON.parse(prop);
+                } else {
+                    prop = {};
+                }
+                include.get(src, prop, function (data) {
+                    var parent = obj.parentNode;
+                    var newElement = include.htmlStringToDOM(data);
+                    if (obj.addEventListener) {
+                        parent.replaceChild(newElement, obj);
+                        //obj.innerHTML = data;
+                    } else if (obj.outerHTML) {
+                        //obj.outerHTML = data;
+                        parent.replaceChild(newElement, obj);
+                    }
+                    var index = obj.getAttribute("index") || "";
+                    var isHead = obj.hasAttribute("header");
+                    if (isHead) {
+                        if (!isNaN(index)) {
+                            index = window.parseInt(index);
+                            $(".nav li").removeClass("active");
+                            $(".nav li").eq(index).addClass("active");
+                        }
+                    }
+
+                });
+            })(_htmls[i]);
 
 		}
 	}
