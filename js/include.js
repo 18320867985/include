@@ -1,8 +1,27 @@
-
 /*
- author
- hqs
- */
+ * 
+ 1.
+    <nav class="_nav nav">
+        <a  class ="nav-item " href="#">全部</a>
+        <a   class ="nav-item "href="#">行业新闻</a>
+        <a   class ="nav-item "href="#">上游动态</a>
+        <a class ="nav-item " href="#">品名日评</a>
+        <a  class ="nav-item " href="#">塑料期货</a>
+    </nav>
+
+2.
+
+<ul class="nav">
+    <li class="active"><a href="../index">首页</a></li>
+    <li class=""><a href="../pricevs"><img src="../../static/images/index/hot.png" alt="价格对比" /> 价格对</a></li>
+    <li class=""><a href="../hyzx/index.html">行业资讯</a></li>
+    <li class=""><a href="../xuelian/information.html">行业资料</a></li>
+    <li class=""><a href="javascript:;">价格走势</a></li>
+    <li class=""><a href="../matter">物性表</a></li>
+    <li class=""><a href="javascript:;">关于我们</a></li>
+</ul>
+
+*/
 
 (function () {
 
@@ -178,7 +197,7 @@
 				 @param {boolean}opt.async 是否为异步请求，true为异步的，false为同步的
 				 @param {object}opt.data 发送的参数，格式为对象类型
 				 @param {function}opt.contentType   内容类型
-				 @param {function}opt.success ajax发送并接收成功调用的回调函数
+				@param {function}opt.success ajax发送并接收成功调用的回调函数
 				 @param {function}opt.error ajax发送并接收error调用的回调函数
 				 @param {function}opt.getXHR 获取xhr对象
 				 @param {number}opt.timeout // 超时
@@ -284,7 +303,7 @@
 		});
 	} else {
         window.attachEvent("onload", function () {
-            includeHtml();
+         includeHtml();
         });
 	}
 
@@ -313,15 +332,21 @@
                         //obj.outerHTML = data;
                         parent.replaceChild(newElement, obj);
                     }
+
                     var index = obj.getAttribute("index") || "";
                     var isHead = obj.hasAttribute("header");
                     if (isHead) {
                         if (!isNaN(index)) {
                             index = window.parseInt(index);
-                            $(".nav li").removeClass("active");
-                            $(".nav li").eq(index).addClass("active");
+                            // console.log(index);
+                            $(parent).find(".nav li").removeClass("active");
+                            $(parent).find(".nav li").eq(index).addClass("active");
+
+                            $(parent).find(".nav .nav-item").removeClass("active");
+                            $(parent).find(".nav .nav-item").eq(index).addClass("active");
                         }
                     }
+
 
                 });
             })(_htmls[i]);
