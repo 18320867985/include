@@ -1,16 +1,19 @@
 /*
  * 
+ * 页面上的引用： <include src="../../template/_nav2.html" ></include>
+ * 页面导航active激活的样式  data-nav data-index="0" 
+ * 
+ * 
  1.
-    <nav class="_nav nav">
-        <a  class ="nav-item " href="#">全部</a>
-        <a   class ="nav-item "href="#">行业新闻</a>
-        <a   class ="nav-item "href="#">上游动态</a>
-        <a class ="nav-item " href="#">品名日评</a>
+    <nav class="nav">
+        <a  class ="nav-item  active" href="#">全部</a>
+        <a  class ="nav-item "href="#">行业新闻</a>
+        <a  class ="nav-item "href="#">上游动态</a>
+        <a  class ="nav-item " href="#">品名日评</a>
         <a  class ="nav-item " href="#">塑料期货</a>
     </nav>
 
 2.
-
 <ul class="nav">
     <li class="active"><a href="../index">首页</a></li>
     <li class=""><a href="../pricevs"><img src="../../static/images/index/hot.png" alt="价格对比" /> 价格对</a></li>
@@ -197,7 +200,7 @@
 				 @param {boolean}opt.async 是否为异步请求，true为异步的，false为同步的
 				 @param {object}opt.data 发送的参数，格式为对象类型
 				 @param {function}opt.contentType   内容类型
-				@param {function}opt.success ajax发送并接收成功调用的回调函数
+				 @param {function}opt.success ajax发送并接收成功调用的回调函数
 				 @param {function}opt.error ajax发送并接收error调用的回调函数
 				 @param {function}opt.getXHR 获取xhr对象
 				 @param {number}opt.timeout // 超时
@@ -333,9 +336,9 @@
                         parent.replaceChild(newElement, obj);
                     }
 
-                    var index = obj.getAttribute("index") || "";
-                    var isHead = obj.hasAttribute("header");
-                    if (isHead) {
+                    var index = obj.getAttribute("data-index") || "";
+                    var isNav = obj.hasAttribute("data-nav");
+                    if (isNav) {
                         if (!isNaN(index)) {
                             index = window.parseInt(index);
                             // console.log(index);
