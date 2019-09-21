@@ -351,9 +351,7 @@
 								$(parent).find(".nav .nav-item").removeClass("active");
 								$(parent).find(".nav .nav-item").eq(index).addClass("active");
 
-							} else {
-
-							}
+							} 
 
 						}
 					}
