@@ -1,2 +1,1 @@
-
-$("body").css("boackground","red");
+console.log("----------")
