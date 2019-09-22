@@ -1,4 +1,16 @@
- li{
-	 border: 200px solid ;
-		
-	}
+li.active {
+	color: blue;
+	font-size: 70px;
+}
+
+.nav-item {
+	display: block;
+	padding: 10px;
+	;
+}
+
+.nav-item.active {
+	color: blue;
+	font-size: 70px;
+	;
+}

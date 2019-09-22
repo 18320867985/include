@@ -324,8 +324,91 @@
 				}
 
 				include.get(src, prop, function(data) {
-					var parent = obj.parentNode;
+
 					var newElement = include.htmlStringToDOM(data);
+
+
+					var index = obj.getAttribute("data-index") || "";
+					var isNav = obj.hasAttribute("data-nav");
+					if (isNav) {
+						if (!isNaN(index)) {
+							index = window.parseInt(index);
+
+							// native
+							var els_nav = newElement.querySelectorAll(".nav");
+							for (var nav_i = 0; nav_i < els_nav.length; nav_i++) {
+
+								// li
+								var nav_items = els_nav[nav_i].querySelectorAll("li");
+								for (var nav_i2 = 0; nav_i2 < nav_items.length; nav_i2++) {
+									var classList = nav_items[nav_i2].getAttribute("class") || "";
+									classList = classList.replace("active", "");
+									nav_items[nav_i2].setAttribute("class", classList);
+									if (nav_i2 === index) {
+										nav_items[nav_i2].setAttribute("class", classList + " active");
+									}
+
+								}
+								// .nav-item
+								var nav_items3 = els_nav[nav_i].querySelectorAll(".nav-item");
+								for (var nav_i3 = 0; nav_i3 < nav_items3.length; nav_i3++) {
+									var classList3 = nav_items3[nav_i3].getAttribute("class") || "";
+									classList3 = classList3.replace("active", "");
+									nav_items3[nav_i3].setAttribute("class", classList3);
+									if (nav_i3 === index) {
+										nav_items3[nav_i3].setAttribute("class", classList3 + " active");
+									}
+
+								}
+
+
+
+							}
+						}
+					}
+					
+					
+
+					//  style add doucmonent ie9+
+					var els_style = newElement.childNodes;
+					var doc_style = document.createDocumentFragment();
+					for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
+						var el = els_style[i0];
+							
+						if (el.nodeType===1&&el.nodeName === "STYLE") {
+							
+							doc_style.insertBefore(el, doc_style.childNodes[0]);
+						}
+					}
+					document.getElementsByTagName("head")[0].appendChild(doc_style);
+
+
+					// link add doucmonent ie9+
+					var els_link = newElement.childNodes;
+					var doc_link = document.createDocumentFragment();
+					for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
+						var el1 = els_link[i1];
+						
+						if (el.nodeType===3&&el1.nodeName === "LINK") {
+							
+							doc_link.insertBefore(el1, doc_link.childNodes[0]);
+						}
+					}
+					document.getElementsByTagName("head")[0].appendChild(doc_link);
+
+					// scriprt add doucmonent ie9+
+					var els_scriprt = newElement.childNodes;
+					var doc_script = document.createDocumentFragment();
+					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
+						var el2 = els_scriprt[i2];
+						if (el.nodeType===3&&el2.tagName === "SCRIPT") {
+							doc_script.insertBefore(el2, doc_script.childNodes[0]);
+						}
+					}
+					document.body.appendChild(doc_script);
+					
+					
+					var parent = obj.parentNode;
 					// ie9+
 					if (obj.addEventListener) {
 						parent.replaceChild(newElement, obj);
@@ -335,62 +418,6 @@
 						//obj.outerHTML = data;
 						parent.replaceChild(newElement, obj);
 					}
-
-
-					var index = obj.getAttribute("data-index") || "";
-					var isNav = obj.hasAttribute("data-nav");
-					if (isNav) {
-						if (!isNaN(index)) {
-							index = window.parseInt(index);
-
-							if ($) {
-								// console.log(index);
-								$(parent).find(".nav li").removeClass("active");
-								$(parent).find(".nav li").eq(index).addClass("active");
-								$(parent).find(".nav .nav-item").removeClass("active");
-								$(parent).find(".nav .nav-item").eq(index).addClass("active");
-
-							}
-
-						}
-					}
-
-
-					//  style add doucmonent ie9+
-					var els_style = parent.children;
-					var doc_style = document.createDocumentFragment();
-					for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
-						var el = els_style[i0];
-						if (el.nodeName === "STYLE") {
-							doc_style.insertBefore(el, doc_style.childNodes[0]);
-						}
-					}
-					document.getElementsByTagName("head")[0].appendChild(doc_style);
-
-
-					// link add doucmonent ie9+
-					var els_link = parent.children;
-					var doc_link = document.createDocumentFragment();
-					for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
-						var el1 = els_link[i1];
-						if (el1.nodeName === "LINK") {
-							doc_link.insertBefore(el1, doc_link.childNodes[0]);
-						}
-					}
-					document.getElementsByTagName("head")[0].appendChild(doc_link);
-
-					// scriprt add doucmonent ie9+
-					var els_scriprt = parent.children;
-					var doc_script = document.createDocumentFragment();
-					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
-						var el2 = els_scriprt[i2];
-
-						if (el2.tagName === "SCRIPT") {
-
-							doc_script.insertBefore(el2, doc_script.childNodes[0]);
-						}
-					}
-					document.body.appendChild(doc_script);
 
 				});
 
