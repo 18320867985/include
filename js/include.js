@@ -344,41 +344,51 @@
 							index = window.parseInt(index);
 
 							if ($) {
-
 								// console.log(index);
 								$(parent).find(".nav li").removeClass("active");
 								$(parent).find(".nav li").eq(index).addClass("active");
 								$(parent).find(".nav .nav-item").removeClass("active");
 								$(parent).find(".nav .nav-item").eq(index).addClass("active");
 
-							} 
+							}
 
 						}
 					}
 
-					//  style
+
+					//  style add doucmonent ie9+
 					var els_style = parent.children;
 					var doc_style = document.createDocumentFragment();
-					for (var i1 = els_style.length - 1; i1 >= 0; i1--) {
-						var el = els_style[i1];
+					for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
+						var el = els_style[i0];
 						if (el.nodeName === "STYLE") {
 							doc_style.insertBefore(el, doc_style.childNodes[0]);
 						}
 					}
-
 					document.getElementsByTagName("head")[0].appendChild(doc_style);
 
-					// scriprt
+
+					// link add doucmonent ie9+
+					var els_link = parent.children;
+					var doc_link = document.createDocumentFragment();
+					for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
+						var el1 = els_link[i1];
+						if (el1.nodeName === "LINK") {
+							doc_link.insertBefore(el1, doc_link.childNodes[0]);
+						}
+					}
+					document.getElementsByTagName("head")[0].appendChild(doc_link);
+
+					// scriprt add doucmonent ie9+
 					var els_scriprt = parent.children;
 					var doc_script = document.createDocumentFragment();
-					for (var i2 = els_scriprt.length - 1; i2 > 0; i2--) {
+					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
 						var el2 = els_scriprt[i2];
 
 						if (el2.tagName === "SCRIPT") {
 
 							doc_script.insertBefore(el2, doc_script.childNodes[0]);
 						}
-
 					}
 					document.body.appendChild(doc_script);
 
