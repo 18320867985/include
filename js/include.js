@@ -365,16 +365,14 @@
 							}
 						}
 					}
-					
-					
+
+
 					//  style add doucmonent ie9+
 					var els_style = newElement.childNodes;
 					var doc_style = document.createDocumentFragment();
 					for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
 						var el = els_style[i0];
-							
-						if (el.nodeType===1&&el.nodeName === "STYLE") {
-							
+						if (el.nodeType === 1 && el.nodeName === "STYLE") {
 							doc_style.insertBefore(el, doc_style.childNodes[0]);
 						}
 					}
@@ -386,9 +384,7 @@
 					var doc_link = document.createDocumentFragment();
 					for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
 						var el1 = els_link[i1];
-						
-						if (el.nodeType===3&&el1.nodeName === "LINK") {
-							
+						if (el1.nodeType === 1 && el1.nodeName === "LINK") {
 							doc_link.insertBefore(el1, doc_link.childNodes[0]);
 						}
 					}
@@ -399,23 +395,14 @@
 					var doc_script = document.createDocumentFragment();
 					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
 						var el2 = els_scriprt[i2];
-						if (el.nodeType===3&&el2.tagName === "SCRIPT") {
+						if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
 							doc_script.insertBefore(el2, doc_script.childNodes[0]);
 						}
 					}
 					document.body.appendChild(doc_script);
-					
-					
+
 					var parent = obj.parentNode;
-					// ie9+
-					if (obj.addEventListener) {
-						parent.replaceChild(newElement, obj);
-						//obj.innerHTML = data;
-					} else if (obj.outerHTML) {
-						// ie8
-						//obj.outerHTML = data;
-						parent.replaceChild(newElement, obj);
-					}
+					parent.replaceChild(newElement, obj);
 
 				});
 
