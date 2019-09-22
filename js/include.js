@@ -327,7 +327,6 @@
 
 					var newElement = include.htmlStringToDOM(data);
 
-
 					var index = obj.getAttribute("data-index") || "";
 					var isNav = obj.hasAttribute("data-nav");
 					if (isNav) {
@@ -368,7 +367,6 @@
 					}
 					
 					
-
 					//  style add doucmonent ie9+
 					var els_style = newElement.childNodes;
 					var doc_style = document.createDocumentFragment();
