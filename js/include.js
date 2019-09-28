@@ -26,38 +26,38 @@
 
 */
 
-(function () {
+(function() {
 
 	/*创建include对象*/
-    var _include = window.include;
+	var _include = window.include;
 	var include = window.include = function(selector, content) {
 
 	};
 
-    include.extend = function (obj) {
-        if (typeof obj === "object") {
-            for (var i in obj) {
-                this[i] = obj[i];
-            }
-        }
+	include.extend = function(obj) {
+		if (typeof obj === "object") {
+			for (var i in obj) {
+				this[i] = obj[i];
+			}
+		}
 
-        return this;
-    };
+		return this;
+	};
 
 	// ajax type
 	function _ajaxFun(url, type, data, _arguments) {
 		var success;
 		var error;
 		var progress;
-		if(typeof data === "object" && _arguments.length > 2) {
+		if (typeof data === "object" && _arguments.length > 2) {
 			success = _arguments[2];
-			if(_arguments.length >= 3) {
+			if (_arguments.length >= 3) {
 				error = _arguments[3];
 				progress = _arguments[4] || null;
 			}
-		} else if(typeof data === "function") {
+		} else if (typeof data === "function") {
 			success = data;
-			if(_arguments.length > 2) {
+			if (_arguments.length > 2) {
 				error = _arguments[2];
 				progress = _arguments[3] || null;
 			}
@@ -74,117 +74,113 @@
 
 	}
 
-    // 链接ajax发送的参数数据
-    function _JoinParams(data) {
+	// 链接ajax发送的参数数据
+	function _JoinParams(data) {
 
-        var params = [];
-        if (data instanceof Object) {
-            _compilerparams(params, data, "");
-        }
-        return params.join("&") || "";
+		var params = [];
+		if (data instanceof Object) {
+			_compilerparams(params, data, "");
+		}
+		return params.join("&") || "";
 
-    }
+	}
 
-    function _compilerparams(params, data, preKey) {
-        preKey = preKey || "";
+	function _compilerparams(params, data, preKey) {
+		preKey = preKey || "";
 
-        for (var key in data) {
-            var data2 = data[key];
+		for (var key in data) {
+			var data2 = data[key];
 
-            if (data2 === undefined) {
-                continue;
-            }
+			if (data2 === undefined) {
+				continue;
+			} else if (data2 !== null && data2.constructor === Object) {
+				for (var key2 in data2) {
 
-            else if (data2 !== null && data2.constructor === Object) {
-                for (var key2 in data2) {
+					var _key = "";
+					var _key2 = "[" + key2 + "]";
+					if (preKey === "") {
+						_key = preKey + key + _key2;
+					} else {
+						_key = preKey + "[" + key + "]" + _key2;
+					}
 
-                    var _key = "";
-                    var _key2 = "[" + key2 + "]";
-                    if (preKey === "") {
-                        _key = preKey + key + _key2;
-                    } else {
-                        _key = preKey + "[" + key + "]" + _key2;
-                    }
+					var _value = data2[key2];
 
-                    var _value = data2[key2];
+					if (_value.constructor === Array || _value.constructor === Object) {
 
-                    if (_value.constructor === Array || _value.constructor === Object) {
+						_compilerparams(params, _value, _key);
+					} else {
+						params.push(encodeURIComponent(_key) + '=' + encodeURIComponent(_value));
+					}
 
-                        _compilerparams(params, _value, _key);
-                    } else {
-                        params.push(encodeURIComponent(_key) + '=' + encodeURIComponent(_value));
-                    }
+				}
+			} else if (data2 !== null && data2.constructor === Array) {
 
-                }
-            }
+				for (var key2_ in data2) {
+					var data3 = data2[key2_];
+					if (typeof data3 === "object") {
+						for (var key3 in data3) {
 
-            else if (data2 !== null && data2.constructor === Array) {
+							var _key_ = "";
+							var _key2_ = "[" + key2_ + "]" + "[" + key3 + "]";
+							if (preKey === "") {
+								_key_ = preKey + key + _key2_;
+							} else {
+								_key_ = preKey + "[" + key + "]" + _key2_;
+							}
 
-                for (var key2_ in data2) {
-                    var data3 = data2[key2_];
-                    if (typeof data3 === "object") {
-                        for (var key3 in data3) {
+							var _value_ = data3[key3];
 
-                            var _key_ = "";
-                            var _key2_ = "[" + key2_ + "]" + "[" + key3 + "]";
-                            if (preKey === "") {
-                                _key_ = preKey + key + _key2_;
-                            } else {
-                                _key_ = preKey + "[" + key + "]" + _key2_;
-                            }
+							if (_value_.constructor === Array || _value_.constructor === Object) {
 
-                            var _value_ = data3[key3];
+								_compilerparams(params, _value_, _key_);
+							} else {
+								params.push(encodeURIComponent(_key_) + '=' + encodeURIComponent(_value_));
+							}
 
-                            if (_value_.constructor === Array || _value_.constructor === Object) {
+						}
+					} else {
+						var _key_2 = preKey + key + "[]";
+						var _value_2 = data3;
+						params.push(encodeURIComponent(_key_2) + '=' + encodeURIComponent(_value_2));
+					}
 
-                                _compilerparams(params, _value_, _key_);
-                            } else {
-                                params.push(encodeURIComponent(_key_) + '=' + encodeURIComponent(_value_));
-                            }
+				}
 
-                        }
-                    } else {
-                        var _key_2 = preKey + key + "[]";
-                        var _value_2 = data3;
-                        params.push(encodeURIComponent(_key_2) + '=' + encodeURIComponent(_value_2));
-                    }
+			} else {
+				var _key_3 = "";
+				if (preKey === "") {
+					_key_3 = preKey + key;
+				} else {
+					_key_3 = preKey + "[" + key + "]";
+				}
+				var dataVal = data[key];
+				dataVal = dataVal === null ? "" : dataVal;
+				params.push(encodeURIComponent(_key_3) + '=' + encodeURIComponent(dataVal));
 
-                }
+			}
 
-            } else {
-                var _key_3 = "";
-                if (preKey === "") {
-                    _key_3 = preKey + key;
-                } else {
-                    _key_3 = preKey + "[" + key + "]";
-                }
-                var dataVal = data[key];
-                dataVal = dataVal === null ? "" : dataVal;
-                params.push(encodeURIComponent(_key_3) + '=' + encodeURIComponent(dataVal));
+		}
+	}
 
-            }
-
-        }
-    }
-
-    include.extend({
+	include.extend({
 
 		// create XHR Object
 		createXHR: function() {
 
-			if(window.XMLHttpRequest) {
+			if (window.XMLHttpRequest) {
 
 				//IE7+、Firefox、Opera、Chrome 和Safari
 				return new XMLHttpRequest();
-			} else if(window.ActiveXObject) {
+			} else if (window.ActiveXObject) {
 
 				//IE6 及以下
 				var versions = ['MSXML2.XMLHttp', 'Microsoft.XMLHTTP'];
-				for(var i = 0, len = versions.length; i < len; i++) {
+				for (var i = 0, len = versions.length; i < len; i++) {
 					try {
 						return new ActiveXObject(version[i]);
-					
-					} catch(e) {
+
+					} catch (e) {
 						//跳过
 					}
 				}
@@ -219,8 +215,8 @@
 			opt.progress = opt.progress || {};
 
 			var xhr = include.createXHR();
-			if(typeof opt.timeout === "number") {
-                xhr.timeout = opt.timeout;
+			if (typeof opt.timeout === "number") {
+				xhr.timeout = opt.timeout;
 			}
 
 			xhr.xhrFields = opt.xhrFields || {};
@@ -228,36 +224,37 @@
 			// 连接参数
 			var postData = _JoinParams(opt.data); // params.join('&');
 
-			if(opt.type.toUpperCase() === 'POST' || opt.type.toUpperCase() === 'PUT' || opt.type.toUpperCase() === 'DELETE') {
+			if (opt.type.toUpperCase() === 'POST' || opt.type.toUpperCase() === 'PUT' || opt.type.toUpperCase() === 'DELETE') {
 				opt.url = opt.url.indexOf("?") === -1 ? opt.url + "?" + "_=" + Math.random() : opt.url + "&_=" + Math.random();
 
 				xhr.open(opt.type, opt.url, opt.async);
 				xhr.setRequestHeader('Content-Type', opt.contentType);
 				xhr.send(postData);
-			} else if(opt.type.toUpperCase() === 'GET') {
-				if(postData.length > 0) {
+			} else if (opt.type.toUpperCase() === 'GET') {
+				if (postData.length > 0) {
 					postData = "&" + postData;
 				}
-				opt.url = opt.url.indexOf("?") === -1 ? opt.url + "?" + "_=" + Math.random() + postData : opt.url + "&_=" + Math.random() + postData;
+				opt.url = opt.url.indexOf("?") === -1 ? opt.url + "?" + "_=" + Math.random() + postData : opt.url + "&_=" +
+					Math.random() + postData;
 
 				xhr.open(opt.type, opt.url, opt.async);
 				xhr.send(null);
 			}
 			xhr.onreadystatechange = function() {
 
-				if(xhr.readyState === 4) {
-					if((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
-						if(typeof opt.success === "function") {
+				if (xhr.readyState === 4) {
+					if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+						if (typeof opt.success === "function") {
 							try {
 								opt.success(JSON.parse(xhr.responseText), xhr.status, xhr.statusText);
-							} catch(e) {
+							} catch (e) {
 								//TODO handle the exception
 								opt.success(xhr.responseText, xhr.status, xhr.statusText);
 							}
 
 						}
 					} else {
-						if(typeof opt.error === "function") {
+						if (typeof opt.error === "function") {
 							opt.error(xhr.status, xhr.statusText);
 						}
 					}
@@ -280,12 +277,12 @@
 			div.innerHTML = txt;
 			df.appendChild(div);
 			var _nodes = df.getElementsByTagName("div")[0].childNodes;
-			for(var i = _nodes.length; i > 0; i--) {
-				if(window.addEventListener) {
+			for (var i = _nodes.length; i > 0; i--) {
+				if (window.addEventListener) {
 					df2.insertBefore(_nodes[i - 1], df2.childNodes[0]);
 				} else {
 					df2.insertBefore(_nodes[i - 1], df2.firstChild);
-					
+
 				}
 
 			}
@@ -300,59 +297,116 @@
 
 (function() {
 
-	if(window.addEventListener) {
+	if (window.addEventListener) {
 		window.addEventListener("load", function() {
 			includeHtml();
 		});
 	} else {
-        window.attachEvent("onload", function () {
-         includeHtml();
-        });
+		window.attachEvent("onload", function() {
+			includeHtml();
+		});
 	}
 
 	function includeHtml() {
 		var _htmls = document.getElementsByTagName("include");
-		
-		for(var i = 0; i < _htmls.length; i++) {
 
-            (function (obj) {
+		for (var i = 0; i < _htmls.length; i++) {
 
-                var src = obj.getAttribute("src");
-                var prop = obj.getAttribute("obj") || "";
+			(function(obj) {
 
-                if (prop) {
-                    prop = JSON.parse(prop);
-                } else {
-                    prop = {};
-                }
-                include.get(src, prop, function (data) {
-                    var parent = obj.parentNode;
-                    var newElement = include.htmlStringToDOM(data);
-                    if (obj.addEventListener) {
-                        parent.replaceChild(newElement, obj);
-                        //obj.innerHTML = data;
-                    } else if (obj.outerHTML) {
-                        //obj.outerHTML = data;
-                        parent.replaceChild(newElement, obj);
-                    }
+				var src = obj.getAttribute("src");
+				var prop = obj.getAttribute("obj") || "";
 
-                    var index = obj.getAttribute("data-index") || "";
-                    var isNav = obj.hasAttribute("data-nav");
-                    if (isNav) {
-                        if (!isNaN(index)) {
-                            index = window.parseInt(index);
-                            // console.log(index);
-                            $(parent).find(".nav li").removeClass("active");
-                            $(parent).find(".nav li").eq(index).addClass("active");
+				if (prop) {
+					prop = JSON.parse(prop);
+				} else {
+					prop = {};
+				}
 
-                            $(parent).find(".nav .nav-item").removeClass("active");
-                            $(parent).find(".nav .nav-item").eq(index).addClass("active");
-                        }
-                    }
+				include.get(src, prop, function(data) {
+
+					var newElement = include.htmlStringToDOM(data);
+
+					var index = obj.getAttribute("data-index") || "";
+					var isNav = obj.hasAttribute("data-nav");
+					if (isNav) {
+						if (!isNaN(index)) {
+							index = window.parseInt(index);
+
+							// native
+							var els_nav = newElement.querySelectorAll(".nav");
+							for (var nav_i = 0; nav_i < els_nav.length; nav_i++) {
+
+								// li
+								var nav_items = els_nav[nav_i].querySelectorAll("li");
+								for (var nav_i2 = 0; nav_i2 < nav_items.length; nav_i2++) {
+									var classList = nav_items[nav_i2].getAttribute("class") || "";
+									classList = classList.replace("active", "");
+									nav_items[nav_i2].setAttribute("class", classList);
+									if (nav_i2 === index) {
+										nav_items[nav_i2].setAttribute("class", classList + " active");
+									}
+
+								}
+								// .nav-item
+								var nav_items3 = els_nav[nav_i].querySelectorAll(".nav-item");
+								for (var nav_i3 = 0; nav_i3 < nav_items3.length; nav_i3++) {
+									var classList3 = nav_items3[nav_i3].getAttribute("class") || "";
+									classList3 = classList3.replace("active", "");
+									nav_items3[nav_i3].setAttribute("class", classList3);
+									if (nav_i3 === index) {
+										nav_items3[nav_i3].setAttribute("class", classList3 + " active");
+									}
+
+								}
 
 
-                });
-            })(_htmls[i]);
+
+							}
+						}
+					}
+
+
+					//  style add doucmonent ie9+
+					var els_style = newElement.childNodes;
+					var doc_style = document.createDocumentFragment();
+					for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
+						var el = els_style[i0];
+						if (el.nodeType === 1 && el.nodeName === "STYLE") {
+							doc_style.insertBefore(el, doc_style.childNodes[0]);
+						}
+					}
+					document.getElementsByTagName("head")[0].appendChild(doc_style);
+
+
+					// link add doucmonent ie9+
+					var els_link = newElement.childNodes;
+					var doc_link = document.createDocumentFragment();
+					for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
+						var el1 = els_link[i1];
+						if (el1.nodeType === 1 && el1.nodeName === "LINK") {
+							doc_link.insertBefore(el1, doc_link.childNodes[0]);
+						}
+					}
+					document.getElementsByTagName("head")[0].appendChild(doc_link);
+
+					// scriprt add doucmonent ie9+
+					var els_scriprt = newElement.childNodes;
+					var doc_script = document.createDocumentFragment();
+					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
+						var el2 = els_scriprt[i2];
+						if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
+							doc_script.insertBefore(el2, doc_script.childNodes[0]);
+						}
+					}
+					document.body.appendChild(doc_script);
+
+					var parent = obj.parentNode;
+					parent.replaceChild(newElement, obj);
+
+				});
+
+			})(_htmls[i]);
 
 		}
 	}

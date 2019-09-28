@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 	<head>
@@ -7,29 +7,53 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<title></title>
-		<link rel="stylesheet" href="" />
+	
 		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!--[if lte IE 8]>
 			<script src="../js/html5shiv.js" type="text/javascript" charset="utf-8"></script>
 			<script src="../js/respond.min.js" type="text/javascript" charset="utf-8"></script>
 		<![endif]-->
+		<style type="text/css">
+				ul{
+				color:red;
+				font-size: 40px;;
+				
+			}
+			
+			li.active{
+				 color:orangered;
+				 font-size: 70px;;
+			}
+			.nav-item{
+				display: block;
+				padding: 10px;;
+			}
+			.nav-item.active{
+				 color:orange;
+				 font-size: 70px;;
+			}
+		</style>
+	
 	</head>
 
 	<body>
-
+	
         <pre>
             页面上的引用：&lt; src="in.html"> &lt;/include>
             * 页面导航active激活的样式  data-nav data-index="0" 
         </pre>
 		<div>
-			<include src="in.html?sid=1234" obj='{"id":1234,"age":12}' />
+			<include src="in.html?sid=1234" obj='{"id":1234,"age":12}' data-nav data-index="2" ></include>
 		</div>
 
-		<div id="a"></div>
 		<hr />
-		<include src="in.html" obj='{"id":1234}'>
-
-			<script src="js/include.js" type="text/javascript" charset="utf-8"></script>
+		<include src="in.1.html?sid=1234"  data-nav data-index="2" ></include>
+		
+	
+		<!-- <include src="in.html" obj='{"id":1234}'> -->
+	<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/include.js" type="text/javascript" charset="utf-8"></script>
+			
 	</body>
 
 </html>
