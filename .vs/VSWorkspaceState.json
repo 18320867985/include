@@ -1,8 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\js"
+    "\\src",
+    "\\src\\js"
   ],
-  "SelectedNode": "\\include.html",
   "PreviewInSolutionExplorer": false
 }

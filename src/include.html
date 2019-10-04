@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 	<head>
@@ -35,28 +35,18 @@
             页面上的引用：&lt; src="in.html"> &lt;/include>
             * 页面导航active激活的样式  data-nav data-index="0" 
         </pre>
-        <div>
-            <include src="in.html?sid=1234" obj='{"id":1234,"age":12}' data-nav data-index="2"></include>
-        </div>
-
+      
+		<include src="in.html?sid=1234" data-nav data-index="1"></include>
         <hr />
-        <include src="in.1.html?sid=1234" data-nav data-index="1"></include>
+       
+		<div>
+			<include src="in2.html?sid=1234" obj='{"id":1234,"age":12}' data-nav data-index="2"></include>
+		</div>
 
-        <!-- <include src="in.html" obj='{"id":1234}'> -->
-        <!--<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>-->
+             <!--<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>-->
         <script src="js/include.js" type="text/javascript" charset="utf-8"></script>
-        <!--//<script src="a.js" type="text/javascript" charset="utf-8"></script>-->
-        <script type="text/javascript">
-
-            var scriptEle = document.createElement("script");
-            scriptEle.type = "text/javasctipt";
-            scriptEle.async = true;
-            scriptEle.src = 'js/jquery-1.11.0.js';
-            var x = document.getElementsByTagName("head")[0];
-           // x.insertBefore(scriptEle, x.firstChild);
-          //  x.appendChild(scriptEle)
-
-        </script>
+      
+    
 
     </body>
 
