@@ -191,16 +191,16 @@
 		},
 
 		/* 封装ajax函数
-				 @param {string}opt.type http连接的方式，包括POST和GET两种方式
-				 @param {string}opt.url 发送请求的url
-				 @param {boolean}opt.async 是否为异步请求，true为异步的，false为同步的
-				 @param {object}opt.data 发送的参数，格式为对象类型
-				 @param {function}opt.contentType   内容类型
-				 @param {function}opt.success ajax发送并接收成功调用的回调函数
-				 @param {function}opt.error ajax发送并接收error调用的回调函数
-				 @param {function}opt.getXHR 获取xhr对象
-				 @param {number}opt.timeout // 超时
-		 	*/
+		 @param {string}opt.type http连接的方式，包括POST和GET两种方式
+		 @param {string}opt.url 发送请求的url
+		 @param {boolean}opt.async 是否为异步请求，true为异步的，false为同步的
+		 @param {object}opt.data 发送的参数，格式为对象类型
+		 @param {function}opt.contentType   内容类型
+		 @param {function}opt.success ajax发送并接收成功调用的回调函数
+		 @param {function}opt.error ajax发送并接收error调用的回调函数
+		 @param {function}opt.getXHR 获取xhr对象
+		 @param {number}opt.timeout // 超时
+		*/
 		ajax: function(opt) {
 
 			// 参数object对象
@@ -268,6 +268,7 @@
 		get: function(url, data) {
 			_ajaxFun(url, "get", data, arguments);
 		},
+		
 		// html字符串转dom对象
 		htmlStringToDOM: function(txt) {
 
@@ -366,40 +367,43 @@
 						}
 					}
 
-
-					//  style add doucmonent ie9+
-					var els_style = newElement.childNodes;
-					var doc_style = document.createDocumentFragment();
-					for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
-						var el = els_style[i0];
-						if (el.nodeType === 1 && el.nodeName === "STYLE") {
-							doc_style.insertBefore(el, doc_style.childNodes[0]);
+					if(window.addEventListener){
+						//  style add doucmonent ie9+
+						var els_style = newElement.childNodes;
+						var doc_style = document.createDocumentFragment();
+						for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
+							var el = els_style[i0];
+							if (el.nodeType === 1 && el.nodeName === "STYLE") {
+								doc_style.insertBefore(el, doc_style.childNodes[0]);
+							}
 						}
-					}
-					document.getElementsByTagName("head")[0].appendChild(doc_style);
-
-
-					// link add doucmonent ie9+
-					var els_link = newElement.childNodes;
-					var doc_link = document.createDocumentFragment();
-					for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
-						var el1 = els_link[i1];
-						if (el1.nodeType === 1 && el1.nodeName === "LINK") {
-							doc_link.insertBefore(el1, doc_link.childNodes[0]);
+						document.getElementsByTagName("head")[0].appendChild(doc_style);
+						
+						
+						// link add doucmonent ie9+
+						var els_link = newElement.childNodes;
+						var doc_link = document.createDocumentFragment();
+						for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
+							var el1 = els_link[i1];
+							if (el1.nodeType === 1 && el1.nodeName === "LINK") {
+								doc_link.insertBefore(el1, doc_link.childNodes[0]);
+							}
 						}
-					}
-					document.getElementsByTagName("head")[0].appendChild(doc_link);
-
-					// scriprt add doucmonent ie9+
-					var els_scriprt = newElement.childNodes;
-					var doc_script = document.createDocumentFragment();
-					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
-						var el2 = els_scriprt[i2];
-						if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
-							doc_script.insertBefore(el2, doc_script.childNodes[0]);
+						document.getElementsByTagName("head")[0].appendChild(doc_link);
+						
+						// scriprt add doucmonent ie9+
+						var els_scriprt = newElement.childNodes;
+						var doc_script = document.createDocumentFragment();
+						for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
+							var el2 = els_scriprt[i2];
+							if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
+								doc_script.insertBefore(el2, doc_script.childNodes[0]);
+							}
 						}
+						
+						document.body.appendChild(doc_script);
 					}
-					document.body.appendChild(doc_script);
+					
 
 					var parent = obj.parentNode;
 					parent.replaceChild(newElement, obj);
