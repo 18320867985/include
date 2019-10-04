@@ -324,7 +324,7 @@
 					prop = {};
 				}
 
-				include.get(src, prop, function(data) {
+				$.get(src, prop, function(data) {
 
 					var newElement = include.htmlStringToDOM(data);
 
