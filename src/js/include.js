@@ -426,7 +426,8 @@
 								if (window.addEventListener) {
 									doc.insertBefore(script, doc_script.childNodes[0]);
 								} else {
-									doc.appendChild(script);
+									//doc.appendChild(script);
+									doc.insertBefore(script, doc_script.firstChild);
 								}
 
 								// 删除节点
