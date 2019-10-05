@@ -46,7 +46,7 @@
 
 	include.define = function(fn) {
 		if (typeof fn === "function") {
-			var name = fn.name || "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
+			var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
 			this.define[name] = {
 				fn: fn,
 				isOnlyRun: true
@@ -374,14 +374,13 @@
 
 								}
 
-
-
 							}
 						}
 					}
 
+					// style link ie9+
 					if (window.addEventListener) {
-						//  style add doucmonent ie9+
+						// style add doucmonent ie9+
 						var els_style = newElement.childNodes;
 						var doc_style = document.createDocumentFragment();
 						for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
@@ -402,52 +401,78 @@
 								doc_link.insertBefore(el1, doc_link.childNodes[0]);
 							}
 						}
+
 						document.getElementsByTagName("head")[0].appendChild(doc_link);
+					}
 
-						// scriprt add doucmonent ie9+
-						var els_scriprt = newElement.childNodes;
-						var doc_script = document.createDocumentFragment();
-						for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
-							var el2 = els_scriprt[i2];
-							if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
+					// scriprt add doucmonent ie9+
+					var els_scriprt = newElement.childNodes;
+					var doc_script = document.createDocumentFragment();
+					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
+						var el2 = els_scriprt[i2];
+						if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
 
-								if (el2.src) {
-									var script = document.createElement("script");
-									script.type = "text/javascript";
-									script.src = el2.getAttribute("src") || "";
-									document.getElementsByTagName('body')[0].insertBefore(script, doc_script.childNodes[0]);
-
-									//js加载完成执行方法
-									script.onload = function(e) {
-										for (var name in include.define) {
-											var o = include.define[name];
-											if (typeof o === "object") {
-												if (typeof o.fn === "function" && o.isOnlyRun === true) {
-													o.fn();
-													o.isOnlyRun = false;
-												}
-											}
-										}
-									};
+							if (el2.src) {
+								var script = document.createElement("script");
+								script.type = "text/javascript";
+								script.src = el2.getAttribute("src") || "";
+								var doc = document.body || document.getElementsByTagName('body')[0];
+								if (window.addEventListener) {
+									doc.insertBefore(script, doc_script.childNodes[0]);
+								} else {
+									doc.appendChild(script);
 								}
 
+								// 删除节点
+								if (el2.parentNode) {
+									var els = el2.parentNode;
+									els.removeChild(el2);
+								}
 
+								//js加载完成执行方法 ie9+
+								if (window.addEventListener) {
+									script.onload = function(e) {
+										runInclude();
+
+									};
+								} else {
+									// ie8 
+									if (script.readyState) {
+                                        script.onreadystatechange = function () {
+                                            runInclude();
+                                        };
+
+									}
+								}
 							}
-						}
 
-						document.body.appendChild(doc_script);
+
+						}
 					}
+
+					document.body.appendChild(doc_script);
 
 					var parent = obj.parentNode;
 					parent.replaceChild(newElement, obj);
-
-
-
 
 				});
 
 			})(_htmls[i], i);
 
+		}
+	}
+
+	// run include.define
+	function runInclude() {
+		for (var name in include.define) {
+			var o = include.define[name];
+
+			if (typeof o === "object") {
+				if (typeof o.fn === "function" && o.isOnlyRun === true) {
+					o.fn();
+					o.isOnlyRun = false;
+				}
+			}
 		}
 	}
 
