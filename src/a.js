@@ -2,7 +2,7 @@
 include.define(function tt(){
 	
     console.log("---a----11111-------");
-    alert("12")
+    alert("11")
 	
 	
 });

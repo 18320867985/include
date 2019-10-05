@@ -405,7 +405,7 @@
 						document.getElementsByTagName("head")[0].appendChild(doc_link);
 					}
 
-					// scriprt add doucmonent ie9+
+					// scriprt add doucmonent 
 					var els_scriprt = newElement.childNodes;
 					var doc_script = document.createDocumentFragment();
 					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
@@ -449,7 +449,6 @@
 
 						}
 					}
-
 					document.body.appendChild(doc_script);
 
 					var parent = obj.parentNode;
