@@ -10,7 +10,7 @@ li.active {
 }
 
 .nav-item.active {
-	color: blue;
+	color: orangered;
 	font-size: 70px;
 	;
 }
