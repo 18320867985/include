@@ -1,7 +1,7 @@
 
 include.define(function (){
 	
-    console.log("-----a2--1111-----");
+    console.log("---define-b-1");
    // alert("22")
 
 	
@@ -9,7 +9,7 @@ include.define(function (){
 
 include.define(function (){
 	
-    console.log("----a2---22222------");
+    console.log("---define-b-2");
     //alert("23")
 
 	

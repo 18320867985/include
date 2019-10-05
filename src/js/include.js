@@ -411,47 +411,58 @@
 						document.getElementsByTagName("head")[0].appendChild(doc_link);
 					
 
-					// scriprt add doucmonent 
+					// scriprt  add doucmonent 
 					var els_scriprt = newElement.childNodes;
 					var doc_script = document.createDocumentFragment();
 					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
 						var el2 = els_scriprt[i2];
 						if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
 
-							if (el2.src) {
-								var script = document.createElement("script");
-								script.type = "text/javascript";
-								script.src = el2.getAttribute("src") || "";
-								var doc = document.body || document.getElementsByTagName('body')[0];
-								if (window.addEventListener) {
-									doc.insertBefore(script, doc_script.childNodes[0]);
-								} else {
-									//doc.appendChild(script);
-									doc.insertBefore(script, doc_script.firstChild);
-								}
+                            if (el2.src) {
+                                // type src
+                                var script = document.createElement("script");
+                                script.type = "text/javascript";
+                                script.src = el2.getAttribute("src") || "";
+                                var doc = document.body || document.getElementsByTagName('body')[0];
+                                if (window.addEventListener) {
+                                    doc.insertBefore(script, doc_script.childNodes[0]);
+                                } else {
+                                    //doc.appendChild(script);
+                                    doc.insertBefore(script, doc_script.firstChild);
+                                }
 
-								// 删除节点
-								if (el2.parentNode) {
-									var els = el2.parentNode;
-									els.removeChild(el2);
-								}
+                                // 删除节点
+                                if (el2.parentNode) {
+                                    var els = el2.parentNode;
+                                    els.removeChild(el2);
+                                }
 
-								//js加载完成执行方法 ie9+
-								if (window.addEventListener) {
-									script.onload = function(e) {
-										runInclude();
+                                //js加载完成执行方法 ie9+
+                                if (window.addEventListener) {
+                                    script.onload = function (e) {
+                                        runInclude();
 
-									};
-								} else {
-									// ie8 
-									if (script.readyState) {
+                                    };
+                                } else {
+                                    // ie8 
+                                    if (script.readyState) {
                                         script.onreadystatechange = function () {
                                             runInclude();
                                         };
 
-									}
-								}
-							}
+                                    }
+                                }
+                            } else {
+
+                                //  script content
+                                var jscontent = el2.innerHTML || "";
+                                if (jscontent) {
+                                    window.eval(jscontent);
+                                    runInclude();
+                                }
+                                
+
+                            }
 
 
 						}

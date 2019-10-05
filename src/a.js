@@ -1,7 +1,7 @@
 
 include.define(function tt(){
 	
-    console.log("---a----11111-------");
+    console.log("---define-a-1");
     //alert("11")
 	
 	
@@ -9,7 +9,7 @@ include.define(function tt(){
 
 include.define(function tt(){
 	
-    console.log("----a---22222------");
+    console.log("---define-a-2");
     //alert("12")
 	
 });
