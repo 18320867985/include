@@ -326,7 +326,7 @@
 
 		for (var i = 0; i < _htmls.length; i++) {
 
-			(function(obj, include_i) {
+			(function(obj) {
 
 				var src = obj.getAttribute("src");
 				var prop = obj.getAttribute("obj") || "";
@@ -497,7 +497,7 @@
 
 				});
 
-			})(_htmls[i], i);
+			})(_htmls[i]);
 
 		}
 	}
