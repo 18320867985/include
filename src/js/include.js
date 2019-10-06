@@ -401,8 +401,10 @@
 						var els_link = newElement.childNodes;
 						var doc_link = document.createDocumentFragment();
 						for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
-							var el1 = els_link[i1];
-							if (el1.nodeType === 1 && el1.nodeName === "LINK") {
+                            var el1 = els_link[i1];
+                           
+                            if (el1.nodeType === 1 && el1.tagName === "LINK") {
+                              
                                 if (window.addEventListener) { doc_link.insertBefore(el1, doc_link.childNodes[0]); }
                                 else {
                                     doc_link.insertBefore(el1, doc_link.firstChild);
