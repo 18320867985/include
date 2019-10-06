@@ -456,7 +456,6 @@
 
                                 // 没有src属性值 应用script 为本内容
                                 var jscontent = el2.innerHTML || "";
-                                
                                 if (jscontent) {
                                    
                                     // ie9+
@@ -466,7 +465,7 @@
                                     } else {
                                      // ie8
                                         doc.insertBefore(script, doc_script.firstChild);
-                                        script.value = jscontent;
+                                        script.jscode= jscontent;
                                         window.eval(jscontent);
                                     }
 
@@ -492,7 +491,7 @@
 
                     document.body.appendChild(doc_script);
 
-
+                    // 添加到document
 					var parent = obj.parentNode;
 					parent.replaceChild(newElement, obj);
 
