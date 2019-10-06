@@ -339,13 +339,14 @@
 
 				include.get(src, prop, function(data) {
 
-					var newElement = include.htmlStringToDOM(data);
+                    var newElement = include.htmlStringToDOM(data);
 
+                    /*---------------------- 激活的样式--------------------------------*/
 					var index = obj.getAttribute("data-index") || "";
-					var isNav = obj.hasAttribute("data-nav");
+                    var isNav = obj.hasAttribute("data-nav");
                     if (isNav) {
 
-                        // 激活的样式
+                       
 						if (!isNaN(index)) {
 							index = window.parseInt(index);
 
@@ -380,23 +381,22 @@
 						}
 					}
 
-			
-						// 添加 style 标签 兼容 ie9+
-						var els_style = newElement.childNodes;
-						var doc_style = document.createDocumentFragment();
-						for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
-							var el = els_style[i0];
-                            if (el.nodeType === 1 && el.nodeName === "STYLE") {
-                               if (window.addEventListener) {doc_style.insertBefore(el, doc_style.childNodes[0]); }
-                                else {
-                                    doc_style.insertBefore(el, doc_style.firstChild);
-                                }
+                    /*----------------------添加 style 标签 兼容 ie9+--------------------------------*/
+					var els_style = newElement.childNodes;
+					var doc_style = document.createDocumentFragment();
+					for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
+						var el = els_style[i0];
+                        if (el.nodeType === 1 && el.nodeName === "STYLE") {
+                            if (window.addEventListener) {doc_style.insertBefore(el, doc_style.childNodes[0]); }
+                            else {
+                                doc_style.insertBefore(el, doc_style.firstChild);
+                            }
 								
-							}
 						}
-						document.getElementsByTagName("head")[0].appendChild(doc_style);
+					}
+                    document.getElementsByTagName("head")[0].appendChild(doc_style);
 
-                    //  添加 link 标签 兼容 ie9+
+                    /* ----------------------添加 link 标签 兼容 ie9 + --------------------------------*/
                     var els_link = newElement.childNodes;
                     var doc_link = document.createDocumentFragment();
 					for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
@@ -410,9 +410,9 @@
                                 }
 							}
 						}
-						document.getElementsByTagName("head")[0].appendChild(doc_link);
-					
-					// 添加 script 标签 兼容 ie8+
+                    document.getElementsByTagName("head")[0].appendChild(doc_link);
+
+					/*----------------------添加 script 标签 兼容 ie8+--------------------------------*/
 					var els_scriprt = newElement.childNodes;
                     var doc_script = document.createDocumentFragment();
 
@@ -490,7 +490,8 @@
                         }
                     }
 
-					document.body.appendChild(doc_script);
+                    document.body.appendChild(doc_script);
+
 
 					var parent = obj.parentNode;
 					parent.replaceChild(newElement, obj);
