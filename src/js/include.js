@@ -343,7 +343,9 @@
 
 					var index = obj.getAttribute("data-index") || "";
 					var isNav = obj.hasAttribute("data-nav");
-					if (isNav) {
+                    if (isNav) {
+
+                        // 激活的样式
 						if (!isNaN(index)) {
 							index = window.parseInt(index);
 
@@ -379,7 +381,7 @@
 					}
 
 			
-						// style add doucmonent ie9+
+						// 添加 style 标签 兼容 ie9+
 						var els_style = newElement.childNodes;
 						var doc_style = document.createDocumentFragment();
 						for (var i0 = els_style.length - 1; i0 >= 0; i0--) {
@@ -395,7 +397,7 @@
 						document.getElementsByTagName("head")[0].appendChild(doc_style);
 
 
-						// link add doucmonent ie9+
+						//  添加 link 标签 兼容 ie9+
 						var els_link = newElement.childNodes;
 						var doc_link = document.createDocumentFragment();
 						for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
@@ -411,30 +413,27 @@
 						document.getElementsByTagName("head")[0].appendChild(doc_link);
 					
 
-					// scriprt  add doucmonent 
+					// 添加 script 标签 兼容 ie8+
 					var els_scriprt = newElement.childNodes;
 					var doc_script = document.createDocumentFragment();
 					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
-						var el2 = els_scriprt[i2];
-						if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
+                        var el2 = els_scriprt[i2];
+                        var doc = document.body || document.getElementsByTagName('body')[0];
+                        if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
 
+                            var script = document.createElement("script");
+                            script.type = "text/javascript";
+
+                            // 有 src属性值 链接
                             if (el2.src) {
-                                // type src
-                                var script = document.createElement("script");
-                                script.type = "text/javascript";
+                               
                                 script.src = el2.getAttribute("src") || "";
-                                var doc = document.body || document.getElementsByTagName('body')[0];
+                              
                                 if (window.addEventListener) {
                                     doc.insertBefore(script, doc_script.childNodes[0]);
                                 } else {
                                     //doc.appendChild(script);
                                     doc.insertBefore(script, doc_script.firstChild);
-                                }
-
-                                // 删除节点
-                                if (el2.parentNode) {
-                                    var els = el2.parentNode;
-                                    els.removeChild(el2);
                                 }
 
                                 //js加载完成执行方法 ie9+
@@ -454,16 +453,31 @@
                                 }
                             } else {
 
-                                //  script content
+                                // 没有src属性值 应用script 为本内容
                                 var jscontent = el2.innerHTML || "";
+                                
                                 if (jscontent) {
-                                    window.eval(jscontent);
+                                   
+                                    // ie9+
+                                    if (window.addEventListener) {
+                                        doc.insertBefore(script, doc_script.childNodes[0]);
+                                        script.innerHTML = jscontent;
+                                    } else {
+                                     // ie8
+                                        doc.insertBefore(script, doc_script.firstChild);
+                                        script.value = jscontent;
+                                        window.eval(jscontent);
+                                    }
+
                                     runInclude();
                                 }
-                                
-
                             }
 
+                            // 删除节点
+                            if (el2.parentNode) {
+                                var els = el2.parentNode;
+                                els.removeChild(el2);
+                            }
 
 						}
 					}
