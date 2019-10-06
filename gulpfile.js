@@ -64,7 +64,7 @@ var gulpJsFile = [
 
 ];
 
-var outputDir="mobile"
+var outputDir = "mobile";
 var outputFileName="mobile.js";
 
 var isgulpMinJs = true;

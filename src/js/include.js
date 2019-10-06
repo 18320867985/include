@@ -396,11 +396,10 @@
 						}
 						document.getElementsByTagName("head")[0].appendChild(doc_style);
 
-
-						//  添加 link 标签 兼容 ie9+
-						var els_link = newElement.childNodes;
-						var doc_link = document.createDocumentFragment();
-						for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
+                    //  添加 link 标签 兼容 ie9+
+                    var els_link = newElement.childNodes;
+                    var doc_link = document.createDocumentFragment();
+					for (var i1 = els_link.length - 1; i1 >= 0; i1--) {
                             var el1 = els_link[i1];
                            
                             if (el1.nodeType === 1 && el1.tagName === "LINK") {
@@ -411,14 +410,14 @@
                                 }
 							}
 						}
-
 						document.getElementsByTagName("head")[0].appendChild(doc_link);
 					
-
 					// 添加 script 标签 兼容 ie8+
 					var els_scriprt = newElement.childNodes;
-					var doc_script = document.createDocumentFragment();
-					for (var i2 = els_scriprt.length - 1; i2 >= 0; i2--) {
+                    var doc_script = document.createDocumentFragment();
+
+                    // 添加 新建 script
+                    for (var i2 = 0; i2 < els_scriprt.length; i2++) {
                         var el2 = els_scriprt[i2];
                         var doc = document.body || document.getElementsByTagName('body')[0];
                         if (el2.nodeType === 1 && el2.tagName === "SCRIPT") {
@@ -474,15 +473,23 @@
                                     runInclude();
                                 }
                             }
+						}
+                    }
+
+                    // 删除原有 script
+                    for (var i3 = els_scriprt.length-1;  i3>=0; i3-- ){
+                        var el3 = els_scriprt[i3];
+                        if (el3.nodeType === 1 && el3.tagName === "SCRIPT") {
 
                             // 删除节点
-                            if (el2.parentNode) {
-                                var els = el2.parentNode;
-                                els.removeChild(el2);
+                            if (el3.parentNode) {
+                                var els = el3.parentNode;
+                                els.removeChild(el3);
                             }
 
-						}
-					}
+                        }
+                    }
+
 					document.body.appendChild(doc_script);
 
 					var parent = obj.parentNode;
