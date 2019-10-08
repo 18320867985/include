@@ -60,13 +60,15 @@
     };
 
    // 异步并行加载js  全部加载完成再执行函数
-    include.define = function (fn) {
+    include.define = function () {
 
+        var arg1 = arguments[0];
+      
         // 定义的函数
-        if (typeof fn === "function" && arguments.length===1) {
+        if (typeof arg1 === "function" && arguments.length===1) {
 			var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
 			this.define[name] = {
-				fn: fn,
+                fn: arg1,
 				isOnlyRun: true
 			};
 
@@ -74,16 +76,14 @@
 
         if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
 
-            var list = arguments[0];
             var fn2 = arguments[1];
-
             // 遍历器
-            var itr = include.iterator(list);
+            var itr = include.iterator(arg1);
             var bl = true;
-            for (var i = 0; i < list.length; i++) {
-                if (include.ckUrl(list[i])) {
-                    include.urls.push(list[i]);
-                    _addAllIterator(itr, fn2, list[i]);
+            for (var i = 0; i < arg1.length; i++) {
+                if (include.ckUrl(arg1[i])) {
+                    include.urls.push(arg1[i]);
+                    _addAllIterator(itr, fn2, arg1[i]);
                     bl = false;
 
                 }
@@ -92,6 +92,7 @@
 
             if (bl) {
                 fn2();
+                include.runInclude();
             }
 
 
