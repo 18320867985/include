@@ -1,3 +1,4 @@
+
 /*
  * 
  * 页面上的引用： <include src="../../template/_nav2.html" ></include>
@@ -46,6 +47,21 @@
 
     // base url;
     include.base = "";
+    include.urls = [];
+
+    include.ckUrl = function (url) {
+
+        for (var i = 0; i < include.urls.length; i++) {
+            var _url = include.urls[i];
+            if (url === _url) {
+                return false;
+            }
+        }
+
+        return true;
+
+
+    };
 
     include.define = function (fn) {
 
@@ -58,73 +74,117 @@
 			};
 
 		}
+ 
+    };
 
-        // 异步按顺序加载js  在执行函数
+     // 异步并行加载js  全部加载完成再执行函数
+    include.all = function () {
+
         if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
 
-            // 遍历器
-            include.iterator(arguments[0]);
+            var list = arguments[0];
+            var fn2 = arguments[1];
 
+            // 遍历器
+            var itr = include.iterator(list);
+            var bl = true;
+            for (var i = 0; i < list.length; i++) {
+                if (include.ckUrl(list[i])) {
+                    include.urls.push(list[i]);
+                    _addAllIterator(itr, fn2, list[i]);
+                    bl = false;
+
+                }
+               
+            }
+
+            if (bl) {
+                fn2();
+            }
+         
+         
         }
 
-		return this;
-	};
+        return this;
 
+    };
+
+    // 添加AMD 新建 script
+    function _addAllIterator(itr, fn2,url) {
+
+        var doc = document.body || document.getElementsByTagName('body')[0];
+     
+            var _url = include.base + url;
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = _url;
+            doc.appendChild(script);
+
+            //js加载完成执行方法 ie9+
+            if (window.addEventListener) {
+
+                script.onload = function (e) {
+                    var itrObj2 = itr.next();
+                   // console.log(itrObj2);
+                    if (itrObj2.done) {
+                        include.runInclude();
+                        fn2();
+                    }     
+                
+                };
+            } else {
+
+                // ie8 
+               // console.log(script.readyState);
+                if (script.readyState) {
+                    if (script.readyState === "loading" || script.readyState === "loaded" || script.readyState === "complete") {
+                        script.onreadystatechange = function () {
+                            
+                            var itrObj2 = itr.next();
+                           // console.log(itrObj2);
+                            if (itrObj2.done) {
+                                include.runInclude();
+                                fn2();
+                             
+                               
+                            }   
+                            script.onreadystatechange = null;
+                        };
+                    }
+                }
+            }
+
+        }
+               
+    // run include.define
+    include.runInclude = function () {
+        for (var name in include.define) {
+            var o = include.define[name];
+
+            if (typeof o === "object") {
+                if (typeof o.fn === "function" && o.isOnlyRun === true) {
+                    o.fn();
+                    o.isOnlyRun = false;
+                }
+            }
+        }
+    };
 
     // 遍历器生成函数
     include.iterator = function (array) {
         var nextIndex = 0;
+
         return {
             next: function () {
+                var _index = array.length - 1;
+                var _nextIndex = nextIndex;
                 return nextIndex < array.length ?
-                    { value: array[nextIndex++], done: false } :
+
+                    { value: array[nextIndex++], done: _nextIndex >= _index ? true : false } :
                     { value: undefined, done: true };
             }
         };
     };
-
-
-    // 添加AMD 新建 script
-    function _addAMD(list) {
-
-        for (var i = 0; i < list.length; i++) {
-
-                var url =include.base + list[i];
-                var doc = document.body || document.getElementsByTagName('body')[0];
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = url;
-
-                if (window.addEventListener) {
-                    doc.insertBefore(script, doc_script.childNodes[0]);
-                } else {
-                    //doc.appendChild(script);
-                    doc.insertBefore(script, doc_script.firstChild);
-                }
-
-                //js加载完成执行方法 ie9+
-                if (window.addEventListener) {
-                    script.onload = function (e) {
-                        runInclude();
-
-                    };
-                } else {
-
-                    // ie8 
-                    if (script.readyState) {
-                        if (script.readyState === "loading" || script.readyState === "loaded" || script.readyState === "complete") {
-                            script.onreadystatechange = function () {
-                                runInclude();
-                            };
-                        }
-                    }
-                }
-         }
-
-            
-        
-    }
-   
 
 	// ajax type
 	function _ajaxFun(url, type, data, _arguments) {
@@ -509,7 +569,7 @@
                                 //js加载完成执行方法 ie9+
                                 if (window.addEventListener) {
                                     script.onload = function (e) {
-                                        runInclude();
+                                         include.runInclude();
 
                                     };
                                 } else {
@@ -518,7 +578,7 @@
                                     if (script.readyState) {
                                         if (script.readyState === "loading" ||script.readyState === "loaded" || script.readyState ==="complete") {
                                             script.onreadystatechange = function () {
-                                                runInclude();
+                                                 include.runInclude();
                                             };
                                         }
                                     }
@@ -540,7 +600,7 @@
                                         window.eval(jscontent);
                                     }
 
-                                    runInclude();
+                                     include.runInclude();
                                 }
                             }
 						}
@@ -570,20 +630,6 @@
 
 			})(_htmls[i]);
 
-		}
-	}
-
-	// run include.define
-	function runInclude() {
-		for (var name in include.define) {
-			var o = include.define[name];
-
-			if (typeof o === "object") {
-				if (typeof o.fn === "function" && o.isOnlyRun === true) {
-					o.fn();
-					o.isOnlyRun = false;
-				}
-			}
 		}
 	}
 

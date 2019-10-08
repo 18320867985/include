@@ -1,10 +1,13 @@
 
-include.define(function (){
-
-    window.clac = function (a, b) {
+include.define(function () {
+    window.x = function (a, b) {
+        console.log(" a + b");
         return a + b;
     };
-
-	
 });
+
+   
+
+
+
 

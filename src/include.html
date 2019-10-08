@@ -45,38 +45,24 @@
 
         <h3>异步加载js</h3>
         <button type="button" id="btn">
-            异步加载 js
+            异步并行加载js  全部加载完成再执行函数
         </button>
 
         <script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/include.js" type="text/javascript" charset="utf-8"></script>
         <script>
-            var it = makeIterator(['a', 'b']);
-
-                //it.next() // { value: "a", done: false }
-                //it.next() // { value: "b", done: false }
-                //it.next() // { value: undefined, done: true }
-
-                function makeIterator(array) {
-                    var nextIndex = 0;
-                   
-                  return {
-                      next: function () {
-                           console.log(nextIndex)
-                      return nextIndex < array.length ?
-                        {value: array[nextIndex++], done: false} :
-                        {value: undefined, done: true};
-                    }
-                  };
-                }
+           
             $(function () {
 
                 $("#btn").on("click", function (e) {
-                    console.log(it.next());
+                   // console.log(it.next());
                 ;
-                    include.define(["amd1.js"], function () {
+                    include.all(["amd1.js","amd2.js","amd3.js"], function () {
 
-
+                     
+                        var res = window.x(12,12)+window.x2(2,2)+window.x3(2,2,2)
+                        console.log(res);
+                        console.log("done");
                     });
 
 
