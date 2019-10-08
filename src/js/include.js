@@ -63,6 +63,7 @@
 
     };
 
+   // 异步并行加载js  全部加载完成再执行函数
     include.define = function (fn) {
 
         // 定义的函数
@@ -73,12 +74,7 @@
 				isOnlyRun: true
 			};
 
-		}
- 
-    };
-
-     // 异步并行加载js  全部加载完成再执行函数
-    include.all = function () {
+        }
 
         if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
 
@@ -95,20 +91,20 @@
                     bl = false;
 
                 }
-               
+
             }
 
             if (bl) {
                 fn2();
             }
-         
-         
+
+
         }
 
         return this;
-
     };
 
+   
     // 添加AMD 新建 script
     function _addAllIterator(itr, fn2,url) {
 

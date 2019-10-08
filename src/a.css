@@ -1,19 +1,11 @@
-li.active {
-	color: blue;
-	font-size: 70px;
-}
-
+li ,
 .nav-item {
 	display: block;
 	padding: 10px;
-	;
+	
 }
 
-.nav-item.active {
-	color: orangered;
-	font-size: 70px;
-	;
-}
+
 
  
 	 
