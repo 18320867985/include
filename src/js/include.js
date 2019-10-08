@@ -120,9 +120,9 @@
             if (window.addEventListener) {
 
                 script.onload = function (e) {
-                    var itrObj2 = itr.next();
-                   // console.log(itrObj2);
-                    if (itrObj2.done) {
+                    var itrObj = itr.next();
+                   // console.log(itrObj);
+                    if (itrObj.done) {
                         include.runInclude();
                         fn2();
                     }     
@@ -136,9 +136,9 @@
                     if (script.readyState === "loading" || script.readyState === "loaded" || script.readyState === "complete") {
                         script.onreadystatechange = function () {
                             
-                            var itrObj2 = itr.next();
-                           // console.log(itrObj2);
-                            if (itrObj2.done) {
+                            var itrObj = itr.next();
+                           // console.log(itrObj);
+                            if (itrObj.done) {
                                 include.runInclude();
                                 fn2();
   
