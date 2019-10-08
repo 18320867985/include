@@ -22,7 +22,7 @@
 		
 			.nav-item{
 				display: block;
-				padding: 10px;;
+				padding: 10px;
 			}
 			
 		</style>
@@ -43,8 +43,47 @@
 			<include src="in2.html?sid=1234" obj='{"id":1234,"age":12}' data-nav data-index="2"></include>
 		</div>
 
-             <!--<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>-->
+        <h3>异步加载js</h3>
+        <button type="button" id="btn">
+            异步加载 js
+        </button>
+
+        <script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/include.js" type="text/javascript" charset="utf-8"></script>
+        <script>
+            var it = makeIterator(['a', 'b']);
+
+                //it.next() // { value: "a", done: false }
+                //it.next() // { value: "b", done: false }
+                //it.next() // { value: undefined, done: true }
+
+                function makeIterator(array) {
+                    var nextIndex = 0;
+                   
+                  return {
+                      next: function () {
+                           console.log(nextIndex)
+                      return nextIndex < array.length ?
+                        {value: array[nextIndex++], done: false} :
+                        {value: undefined, done: true};
+                    }
+                  };
+                }
+            $(function () {
+
+                $("#btn").on("click", function (e) {
+                    console.log(it.next());
+                ;
+                    include.define(["amd1.js"], function () {
+
+
+                    });
+
+
+                });
+
+            });
+        </script>
       
     
     </body>

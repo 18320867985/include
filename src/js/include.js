@@ -2,8 +2,7 @@
  * 
  * 页面上的引用： <include src="../../template/_nav2.html" ></include>
  * 页面导航active激活的样式  data-nav data-index="0" 
- * 
- * 
+ 
  1.
     <nav class="nav">
         <a  class ="nav-item  active" href="#">全部</a>
@@ -14,6 +13,7 @@
     </nav>
 
 2.
+
 <ul class="nav">
     <li class="active"><a href="../index">首页</a></li>
     <li class=""><a href="../pricevs"><img src="../../static/images/index/hot.png" alt="价格对比" /> 价格对</a></li>
@@ -42,10 +42,15 @@
 		}
 
 		return this;
-	};
+    };
 
-	include.define = function(fn) {
-		if (typeof fn === "function") {
+    // base url;
+    include.base = "";
+
+    include.define = function (fn) {
+
+        // 定义的函数
+        if (typeof fn === "function" && arguments.length===1) {
 			var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
 			this.define[name] = {
 				fn: fn,
@@ -54,8 +59,72 @@
 
 		}
 
+        // 异步按顺序加载js  在执行函数
+        if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
+
+            // 遍历器
+            include.iterator(arguments[0]);
+
+        }
+
 		return this;
 	};
+
+
+    // 遍历器生成函数
+    include.iterator = function (array) {
+        var nextIndex = 0;
+        return {
+            next: function () {
+                return nextIndex < array.length ?
+                    { value: array[nextIndex++], done: false } :
+                    { value: undefined, done: true };
+            }
+        };
+    };
+
+
+    // 添加AMD 新建 script
+    function _addAMD(list) {
+
+        for (var i = 0; i < list.length; i++) {
+
+                var url =include.base + list[i];
+                var doc = document.body || document.getElementsByTagName('body')[0];
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = url;
+
+                if (window.addEventListener) {
+                    doc.insertBefore(script, doc_script.childNodes[0]);
+                } else {
+                    //doc.appendChild(script);
+                    doc.insertBefore(script, doc_script.firstChild);
+                }
+
+                //js加载完成执行方法 ie9+
+                if (window.addEventListener) {
+                    script.onload = function (e) {
+                        runInclude();
+
+                    };
+                } else {
+
+                    // ie8 
+                    if (script.readyState) {
+                        if (script.readyState === "loading" || script.readyState === "loaded" || script.readyState === "complete") {
+                            script.onreadystatechange = function () {
+                                runInclude();
+                            };
+                        }
+                    }
+                }
+         }
+
+            
+        
+    }
+   
 
 	// ajax type
 	function _ajaxFun(url, type, data, _arguments) {
@@ -444,12 +513,14 @@
 
                                     };
                                 } else {
+
                                     // ie8 
                                     if (script.readyState) {
-                                        script.onreadystatechange = function () {
-                                            runInclude();
-                                        };
-
+                                        if (script.readyState === "loading" ||script.readyState === "loaded" || script.readyState ==="complete") {
+                                            script.onreadystatechange = function () {
+                                                runInclude();
+                                            };
+                                        }
                                     }
                                 }
                             } else {
