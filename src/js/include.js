@@ -145,8 +145,7 @@
                             if (itrObj2.done) {
                                 include.runInclude();
                                 fn2();
-                             
-                               
+  
                             }   
                             script.onreadystatechange = null;
                         };
@@ -578,7 +577,8 @@
                                     if (script.readyState) {
                                         if (script.readyState === "loading" ||script.readyState === "loaded" || script.readyState ==="complete") {
                                             script.onreadystatechange = function () {
-                                                 include.runInclude();
+                                                include.runInclude();
+                                                script.onreadystatechange = null;
                                             };
                                         }
                                     }
