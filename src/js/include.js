@@ -1,9 +1,9 @@
+
 /*
  * 
  * 页面上的引用： <include src="../../template/_nav2.html" ></include>
  * 页面导航active激活的样式  data-nav data-index="0" 
- * 
- * 
+ 
  1.
     <nav class="nav">
         <a  class ="nav-item  active" href="#">全部</a>
@@ -14,6 +14,7 @@
     </nav>
 
 2.
+
 <ul class="nav">
     <li class="active"><a href="../index">首页</a></li>
     <li class=""><a href="../pricevs"><img src="../../static/images/index/hot.png" alt="价格对比" /> 价格对</a></li>
@@ -42,10 +43,30 @@
 		}
 
 		return this;
-	};
+    };
 
-	include.define = function(fn) {
-		if (typeof fn === "function") {
+    // base url;
+    include.base = "";
+    include.urls = [];
+
+    include.ckUrl = function (url) {
+
+        for (var i = 0; i < include.urls.length; i++) {
+            var _url = include.urls[i];
+            if (url === _url) {
+                return false;
+            }
+        }
+
+        return true;
+
+
+    };
+
+    include.define = function (fn) {
+
+        // 定义的函数
+        if (typeof fn === "function" && arguments.length===1) {
 			var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
 			this.define[name] = {
 				fn: fn,
@@ -53,9 +74,116 @@
 			};
 
 		}
+ 
+    };
 
-		return this;
-	};
+     // 异步并行加载js  全部加载完成再执行函数
+    include.all = function () {
+
+        if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
+
+            var list = arguments[0];
+            var fn2 = arguments[1];
+
+            // 遍历器
+            var itr = include.iterator(list);
+            var bl = true;
+            for (var i = 0; i < list.length; i++) {
+                if (include.ckUrl(list[i])) {
+                    include.urls.push(list[i]);
+                    _addAllIterator(itr, fn2, list[i]);
+                    bl = false;
+
+                }
+               
+            }
+
+            if (bl) {
+                fn2();
+            }
+         
+         
+        }
+
+        return this;
+
+    };
+
+    // 添加AMD 新建 script
+    function _addAllIterator(itr, fn2,url) {
+
+        var doc = document.body || document.getElementsByTagName('body')[0];
+     
+            var _url = include.base + url;
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = _url;
+            doc.appendChild(script);
+
+            //js加载完成执行方法 ie9+
+            if (window.addEventListener) {
+
+                script.onload = function (e) {
+                    var itrObj2 = itr.next();
+                   // console.log(itrObj2);
+                    if (itrObj2.done) {
+                        include.runInclude();
+                        fn2();
+                    }     
+                
+                };
+            } else {
+
+                // ie8 
+               // console.log(script.readyState);
+                if (script.readyState) {
+                    if (script.readyState === "loading" || script.readyState === "loaded" || script.readyState === "complete") {
+                        script.onreadystatechange = function () {
+                            
+                            var itrObj2 = itr.next();
+                           // console.log(itrObj2);
+                            if (itrObj2.done) {
+                                include.runInclude();
+                                fn2();
+                             
+                               
+                            }   
+                            script.onreadystatechange = null;
+                        };
+                    }
+                }
+            }
+
+        }
+               
+    // run include.define
+    include.runInclude = function () {
+        for (var name in include.define) {
+            var o = include.define[name];
+
+            if (typeof o === "object") {
+                if (typeof o.fn === "function" && o.isOnlyRun === true) {
+                    o.fn();
+                    o.isOnlyRun = false;
+                }
+            }
+        }
+    };
+
+    // 遍历器生成函数
+    include.iterator = function (array) {
+        var nextIndex = 0;
+
+        return {
+            next: function () {
+                var _index = array.length - 1;
+                var _nextIndex = nextIndex;
+                return nextIndex < array.length ?
+                    { value: array[nextIndex++], done: _nextIndex >= _index ? true : false } :
+                    { value: undefined, done: true };
+            }
+        };
+    };
 
 	// ajax type
 	function _ajaxFun(url, type, data, _arguments) {
@@ -405,6 +533,7 @@
                             if (el1.nodeType === 1 && el1.tagName === "LINK") {
                               
                                 if (window.addEventListener) { doc_link.insertBefore(el1, doc_link.childNodes[0]); }
+
                                 else {
                                     doc_link.insertBefore(el1, doc_link.firstChild);
                                 }
@@ -440,16 +569,18 @@
                                 //js加载完成执行方法 ie9+
                                 if (window.addEventListener) {
                                     script.onload = function (e) {
-                                        runInclude();
+                                         include.runInclude();
 
                                     };
                                 } else {
+
                                     // ie8 
                                     if (script.readyState) {
-                                        script.onreadystatechange = function () {
-                                            runInclude();
-                                        };
-
+                                        if (script.readyState === "loading" ||script.readyState === "loaded" || script.readyState ==="complete") {
+                                            script.onreadystatechange = function () {
+                                                 include.runInclude();
+                                            };
+                                        }
                                     }
                                 }
                             } else {
@@ -469,7 +600,7 @@
                                         window.eval(jscontent);
                                     }
 
-                                    runInclude();
+                                     include.runInclude();
                                 }
                             }
 						}
@@ -499,20 +630,6 @@
 
 			})(_htmls[i]);
 
-		}
-	}
-
-	// run include.define
-	function runInclude() {
-		for (var name in include.define) {
-			var o = include.define[name];
-
-			if (typeof o === "object") {
-				if (typeof o.fn === "function" && o.isOnlyRun === true) {
-					o.fn();
-					o.isOnlyRun = false;
-				}
-			}
 		}
 	}
 
