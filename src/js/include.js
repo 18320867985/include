@@ -179,7 +179,6 @@
                 var _index = array.length - 1;
                 var _nextIndex = nextIndex;
                 return nextIndex < array.length ?
-
                     { value: array[nextIndex++], done: _nextIndex >= _index ? true : false } :
                     { value: undefined, done: true };
             }
@@ -534,6 +533,7 @@
                             if (el1.nodeType === 1 && el1.tagName === "LINK") {
                               
                                 if (window.addEventListener) { doc_link.insertBefore(el1, doc_link.childNodes[0]); }
+
                                 else {
                                     doc_link.insertBefore(el1, doc_link.firstChild);
                                 }
