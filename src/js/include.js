@@ -26,10 +26,10 @@
 (function() {
 
 	/*创建include对象*/
-	var _include = window.include;
-	var include = window.include = function(selector, content) {
-
-	};
+    var _include = window.include;
+    var _define = window.define;
+    var _require = window.require;
+	var include = window.include = function(selector, content) {};
 
 	include.extend = function(obj) {
 		if (typeof obj === "object") {
@@ -56,26 +56,44 @@
 
         return true;
 
-
     };
 
-   // 异步并行加载js  全部加载完成再执行函数
-    include.define = function () {
+ 
+    // 定义执行函数
+    window.define= include.define = function () {
 
         var arg1 = arguments[0];
       
         // 定义的函数
         if (typeof arg1 === "function" && arguments.length===1) {
-			var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
+            var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
 			this.define[name] = {
                 fn: arg1,
 				isOnlyRun: true
 			};
+        }
+ 
+        return this;
+    };
 
+    // amd module extend
+    window.define.extend = function (obj) {
+        if (typeof obj === "object") {
+            for (var i in obj) {
+                this[i] = obj[i];
+            }
         }
 
-        if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
+        return this;
+    };
+    // define.amd
+    window.define.extend({ amd: true });
 
+    // 异步并行加载js  全部加载完成再执行函数
+    window.require= include.require = include.all = function () {
+
+        if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
+            var arg1 = arguments[0];
             var fn2 = arguments[1];
             // 遍历器
             var itr = include.iterator(arg1);
@@ -85,23 +103,17 @@
                     include.urls.push(arg1[i]);
                     _addAllIterator(itr, fn2, arg1[i]);
                     bl = false;
-
                 }
-
             }
 
             if (bl) {
                 fn2();
-                include.runInclude();
             }
-
-
         }
 
         return this;
     };
 
-   
     // 添加AMD 新建 script
     function _addAllIterator(itr, fn2,url) {
 
@@ -122,12 +134,13 @@
                     if (itrObj.done) {
                         include.runInclude();
                         fn2();
+                        
                     }     
                 
                 };
             } else {
 
-                // ie8 
+               // ie8 
                // console.log(script.readyState);
                 if (script.readyState) {
                     if (script.readyState === "loading" || script.readyState === "loaded" || script.readyState === "complete") {
@@ -138,6 +151,7 @@
                             if (itrObj.done) {
                                 include.runInclude();
                                 fn2();
+                               
   
                             }   
                             script.onreadystatechange = null;
@@ -613,7 +627,7 @@
                         }
                     }
 
-                    document.body.appendChild(doc_script);
+                    document.getElementsByTagName("body")[0].appendChild(doc_script);
 
                     // 添加到document
 					var parent = obj.parentNode;
