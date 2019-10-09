@@ -134,9 +134,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 								if (window.addEventListener) {
 
 												script.onload = function (e) {
-																var itrObj = itr.next();
 
-																include.runIncludeAndCache(_url);
+																var itrObj = itr.next();
+																include.runIncludeAndCache(itrObj.value);
 																if (itrObj.done) {
 																				fn2.apply(null, _getCaches(arrs));
 																}
@@ -150,7 +150,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 																				script.onreadystatechange = function () {
 
 																								var itrObj = itr.next();
-																								include.runIncludeAndCache(_url);
+																								include.runIncludeAndCache(itrObj.value);
 
 																								if (itrObj.done) {
 																												fn2.apply(null, _getCaches(arrs));
@@ -166,17 +166,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 				include.runIncludeAndCache = function (url) {
 
 								for (var name in include.define) {
-												var o = include.define[name];
 
+												var o = include.define[name];
 												if ((typeof o === "undefined" ? "undefined" : _typeof(o)) === "object") {
 																if (typeof o.fn === "function" && o.isOnlyRun === true) {
+
 																				var res = o.fn();
 																				o.isOnlyRun = false;
-
 																				include.caches.push({
 																								v: res,
 																								url: url
 																				});
+
+																				break;
 																}
 												}
 								}
