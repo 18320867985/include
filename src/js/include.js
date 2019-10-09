@@ -44,6 +44,7 @@
     // base url;
     include.base = "";
     include.urls = [];
+    include.caches=[];
 
     include.ckUrl = function (url) {
 
@@ -69,7 +70,8 @@
             var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
 			this.define[name] = {
                 fn: arg1,
-				isOnlyRun: true
+                isOnlyRun: true,
+                name:""
 			};
         }
  
@@ -86,6 +88,7 @@
 
         return this;
     };
+
     // define.amd
     window.define.extend({ amd: true });
 
@@ -95,19 +98,20 @@
         if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
             var arg1 = arguments[0];
             var fn2 = arguments[1];
+
             // 遍历器
             var itr = include.iterator(arg1);
             var bl = true;
             for (var i = 0; i < arg1.length; i++) {
                 if (include.ckUrl(arg1[i])) {
                     include.urls.push(arg1[i]);
-                    _addAllIterator(itr, fn2, arg1[i]);
+                    _addAllIterator(itr, fn2, arg1[i], arg1);
                     bl = false;
                 }
             }
 
             if (bl) {
-                fn2();
+                fn2.apply(null,_getCaches(arg1));
             }
         }
 
@@ -115,7 +119,7 @@
     };
 
     // 添加AMD 新建 script
-    function _addAllIterator(itr, fn2,url) {
+    function _addAllIterator(itr, fn2,url,arrs) {
 
         var doc = document.body || document.getElementsByTagName('body')[0];
      
@@ -130,11 +134,10 @@
 
                 script.onload = function (e) {
                     var itrObj = itr.next();
-                   // console.log(itrObj);
-                    if (itrObj.done) {
-                        include.runInclude();
-                        fn2();
-                        
+                 
+                    include.runIncludeAndCache(_url);
+                    if (itrObj.done) {   
+                        fn2.apply(null,_getCaches(arrs));
                     }     
                 
                 };
@@ -147,12 +150,10 @@
                         script.onreadystatechange = function () {
                             
                             var itrObj = itr.next();
-                           // console.log(itrObj);
+                            include.runIncludeAndCache(_url);
+                        
                             if (itrObj.done) {
-                                include.runInclude();
-                                fn2();
-                               
-  
+                                fn2.apply(null, _getCaches(arrs));
                             }   
                             script.onreadystatechange = null;
                         };
@@ -162,8 +163,29 @@
 
         }
                
+    // run include.define and  caches
+    include.runIncludeAndCache = function (url) {
+
+        for (var name in include.define) {
+            var o = include.define[name];
+
+            if (typeof o === "object") {
+                if (typeof o.fn === "function" && o.isOnlyRun === true) {
+                  var res= o.fn();
+                    o.isOnlyRun = false;
+
+                    include.caches.push({
+                        v: res,
+                        url: url
+                    });
+                }
+            }
+        }
+    };
+
     // run include.define
     include.runInclude = function () {
+
         for (var name in include.define) {
             var o = include.define[name];
 
@@ -176,10 +198,32 @@
         }
     };
 
+    // 获取列表缓存
+    function _getCaches(list) {
+        var arrs = [];
+
+        for (var i = 0; i < include.caches.length; i++) {
+
+            var o = include.caches[i];
+
+            for (var y = 0; y < list.length; y++) {
+                var o2 = list[y];
+                if (o.url === o2) {
+                    arrs.push(o.v);
+                    break;
+                }
+
+            }
+
+        }
+
+        return arrs;
+
+    }
+
     // 遍历器生成函数
     include.iterator = function (array) {
         var nextIndex = 0;
-
         return {
             next: function () {
                 var _index = array.length - 1;

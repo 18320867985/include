@@ -56,9 +56,9 @@
 
                 $("#btn").on("click", function (e) {
               
-                    require(["amd1.js","amd2.js","amd3.js"], function () {
+                    require(["amd1.js","amd2.js","amd3.js"], function (a,b,c) {
 
-                        var res = window.x(12,12)+window.x2(2,2)+window.x3(2,2,2)
+                        var res = a(12,12)+b(2,2)+c(2,2,2)
                         console.log(res);
                         console.log("done");
                     });
