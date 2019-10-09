@@ -128,6 +128,7 @@
             script.src = _url;
             doc.appendChild(script);
 
+
             //js加载完成执行方法 ie9+
             if (window.addEventListener) {
 
