@@ -149,8 +149,10 @@
             script.type = "text/javascript";
             script.src = _url;
             var orign = location.protocol+"//" + location.host;
-            var spurl= _url.replace(orign+"/", "");
-            var newurl = orign + "/" + spurl;
+            var spurl = _url.replace(orign + "/", "");
+            var reg = /(http|https):\/\//;           
+             // var newurl = orign + "/" + spurl;
+             var  newurl = reg.test(spurl) ? spurl : orign + "/" + spurl;
             script.setAttribute("data-src", newurl);
             doc.appendChild(script);
         
@@ -232,8 +234,9 @@
             var _url = list[i];
             var orign = location.protocol + "//" + location.host;
             var spurl = _url.replace(orign+"/", "");
-            var newurl = orign + "/" + spurl;
-            
+            //var newurl = orign + "/" + spurl;
+            var reg = /(http|https):\/\//;     
+            var newurl = reg.test(spurl) ? spurl : orign + "/" + spurl;
             for (var y = 0; y < include.caches.length; y++) {
                 var o2 = include.caches[y];
                 if (newurl === o2.url) {
