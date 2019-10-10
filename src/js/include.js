@@ -20,7 +20,6 @@
     <li class=""><a href="../matter">物性表</a></li>
     <li class=""><a href="javascript:;">关于我们</a></li>
 </ul>
-
 */
 
 (function() {
