@@ -1,8 +1,9 @@
 
 include.define(function () {
-    window.x = function (a, b) {
-        console.log(" a + b");
-        return a + b;
+
+       return  function (a1, b1) {
+        //console.log("a + b");
+        return a1 + b1;
     };
 });
 

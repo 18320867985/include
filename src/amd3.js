@@ -1,11 +1,11 @@
 
+include.define(function () {
 
- 
-    window.x3 = function (a, b,c) {
-        console.log("a*b*c");
-        return a*b*c;
+return  function (a3, b3, c3) {
+      //  console.log("a*b*c");
+        return a3 * b3 * c3;
     };
-
+});
 
 
 

@@ -26,10 +26,10 @@
 (function() {
 
 	/*创建include对象*/
-	var _include = window.include;
-	var include = window.include = function(selector, content) {
-
-	};
+    var _include = window.include;
+    var _define = window.define;
+    var _require = window.require;
+	var include = window.include = function(selector, content) {};
 
 	include.extend = function(obj) {
 		if (typeof obj === "object") {
@@ -44,6 +44,7 @@
     // base url;
     include.base = "";
     include.urls = [];
+    include.caches=[];
 
     include.ckUrl = function (url) {
 
@@ -56,54 +57,90 @@
 
         return true;
 
-
     };
 
-   // 异步并行加载js  全部加载完成再执行函数
-    include.define = function () {
+    // 定义执行函数
+    window.define= include.define = function () {
 
-        var arg1 = arguments[0];
+        var arg1;
       
         // 定义的函数
-        if (typeof arg1 === "function" && arguments.length===1) {
-			var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
-			this.define[name] = {
-                fn: arg1,
-				isOnlyRun: true
-			};
+        var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
+        if (arguments.length === 1 && typeof arguments[0] === "function") {
+            
+               arg1 = arguments[0];
 
         }
 
-        if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
+        if (arguments.length === 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
 
+            arg1 = arguments[1];
+
+        }
+
+        if (arguments.length === 3 && typeof arguments[0] === "string" && arguments[1] instanceof Array && typeof arguments[2] === "function") {
+
+            arg1 = arguments[2];
+
+        }
+
+
+        if (arguments.length >= 1) {
+            var src = _getCurrentScript();
+
+            this.define[name] = {
+                fn: arg1,
+                isOnlyRun: true,
+                url: src
+            };
+        }
+       
+ 
+        return this;
+    };
+
+    // amd module extend
+    window.define.extend = function (obj) {
+        if (typeof obj === "object") {
+            for (var i in obj) {
+                this[i] = obj[i];
+            }
+        }
+
+        return this;
+    };
+
+    // define.amd
+    window.define.extend({ amd: true });
+
+    // 异步并行加载js  全部加载完成再执行函数
+    window.require= include.require  = function () {
+
+        if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
+            var arg1 = arguments[0];
             var fn2 = arguments[1];
+
             // 遍历器
             var itr = include.iterator(arg1);
             var bl = true;
             for (var i = 0; i < arg1.length; i++) {
                 if (include.ckUrl(arg1[i])) {
                     include.urls.push(arg1[i]);
-                    _addAllIterator(itr, fn2, arg1[i]);
+                    _addAllIterator(itr, fn2, arg1[i], arg1);
                     bl = false;
-
                 }
-
             }
 
             if (bl) {
-                fn2();
-                include.runInclude();
+                fn2.apply(null, _getCaches(arg1));
             }
-
-
         }
 
         return this;
     };
 
-   
     // 添加AMD 新建 script
-    function _addAllIterator(itr, fn2,url) {
+    function _addAllIterator(itr, fn2,url,arrs) {
 
         var doc = document.body || document.getElementsByTagName('body')[0];
      
@@ -111,45 +148,72 @@
             var script = document.createElement("script");
             script.type = "text/javascript";
             script.src = _url;
+            var orign = location.protocol+"//" + location.host;
+            var spurl = _url.replace(orign + "/", "");
+            var reg = /(http|https):\/\//;           
+             // var newurl = orign + "/" + spurl;
+             var  newurl = reg.test(spurl) ? spurl : orign + "/" + spurl;
+            script.setAttribute("data-src", newurl);
             doc.appendChild(script);
-
+        
             //js加载完成执行方法 ie9+
             if (window.addEventListener) {
 
                 script.onload = function (e) {
+
                     var itrObj = itr.next();
-                   // console.log(itrObj);
-                    if (itrObj.done) {
-                        include.runInclude();
-                        fn2();
+                    if (itrObj.done) {   
+                        include.runIncludeAndCache();
+                        fn2.apply(null, _getCaches(arrs));
+                        // console.log("_getCaches",_getCaches(arrs));
                     }     
                 
                 };
             } else {
 
-                // ie8 
+               // ie8 
                // console.log(script.readyState);
                 if (script.readyState) {
                     if (script.readyState === "loading" || script.readyState === "loaded" || script.readyState === "complete") {
                         script.onreadystatechange = function () {
                             
                             var itrObj = itr.next();
-                           // console.log(itrObj);
                             if (itrObj.done) {
-                                include.runInclude();
-                                fn2();
-  
+                                include.runIncludeAndCache();
+                                fn2.apply(null, _getCaches(arrs));
                             }   
                             script.onreadystatechange = null;
                         };
                     }
                 }
             }
-
         }
                
+    // run include.define and  caches
+    include.runIncludeAndCache = function () {
+
+        for (var name in include.define) {
+
+            var o = include.define[name];
+            if (typeof o === "object") {
+                if (typeof o.fn === "function" && o.isOnlyRun === true) {
+                 
+                    var res= o.fn();
+                    o.isOnlyRun = false;
+                    include.caches.push({
+                        v: res,
+                        url:o.url
+                    });
+
+                   
+                }
+            }
+        }
+    };
+
     // run include.define
     include.runInclude = function () {
+
         for (var name in include.define) {
             var o = include.define[name];
 
@@ -162,10 +226,75 @@
         }
     };
 
+    // 获取列表缓存
+    function _getCaches(list) {
+        var arrs = [];
+
+        for (var i = 0; i < list.length; i++) {
+            var _url = list[i];
+            var orign = location.protocol + "//" + location.host;
+            var spurl = _url.replace(orign+"/", "");
+            //var newurl = orign + "/" + spurl;
+            var reg = /(http|https):\/\//;     
+            var newurl = reg.test(spurl) ? spurl : orign + "/" + spurl;
+            for (var y = 0; y < include.caches.length; y++) {
+                var o2 = include.caches[y];
+                if (newurl === o2.url) {
+                    arrs.push(o2.v);
+                    break;
+                }
+            }
+        }
+
+        return arrs;
+
+    }
+
+    // getCurrentScript
+    function _getCurrentScript() {
+
+        if (document.currentScript) { 
+
+            return document.currentScript.getAttribute("data-src") || "";
+        }
+        else {
+            var stack, e, nodes = document.getElementsByTagName("script");
+            for (var i = 0, node; i < nodes.length; i++) {
+                node = nodes[i];
+                if (node.readyState === "interactive") {
+                    // ie8 ,ie9 ie10
+                    return node.getAttribute("data-src") || "";
+                }
+                else if (!node.readyState) {
+                    // ie11
+                    try {
+                        node.err.err; //强制报错,以便捕获e.stack
+                    } catch (e) {
+                        stack = e.stack;
+                        //console.log("e:", e);
+                    }
+                    if (stack) {
+                        // chrome IE10使用 at, firefox opera 使用 @
+                        e = stack.indexOf(' at ') !== -1 ? ' at ' : '@';
+                        while (stack.indexOf(e) !== -1) {
+                            stack = stack.substring(stack.indexOf(e) + e.length);
+                        }
+                     
+                        return stack.match(/(http|https):\/\/.*\.js/)[0];
+                    }
+                }
+            }
+        }
+       
+      
+
+       
+
+    }
+
     // 遍历器生成函数
     include.iterator = function (array) {
         var nextIndex = 0;
-
         return {
             next: function () {
                 var _index = array.length - 1;
@@ -613,7 +742,7 @@
                         }
                     }
 
-                    document.body.appendChild(doc_script);
+                    document.getElementsByTagName("body")[0].appendChild(doc_script);
 
                     // 添加到document
 					var parent = obj.parentNode;
