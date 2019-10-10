@@ -62,19 +62,39 @@
     // 定义执行函数
     window.define= include.define = function () {
 
-        var arg1 = arguments[0];
+        var arg1;
       
         // 定义的函数
-        if (typeof arg1 === "function" && arguments.length === 1) {
-            var src = _getCurrentScript().getAttribute("src") || "";
-           // console.log("define",src);
-            var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
-			this.define[name] = {
+        var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
+        if (arguments.length === 1 && typeof arguments[0] === "function") {
+            
+               arg1 = arguments[0];
+
+        }
+
+        if (arguments.length === 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
+
+            arg1 = arguments[1];
+
+        }
+
+        if (arguments.length === 3 && typeof arguments[0] === "string" && arguments[1] instanceof Array && typeof arguments[2] === "function") {
+
+            arg1 = arguments[2];
+
+        }
+
+
+        if (arguments.length >= 1) {
+            var src = _getCurrentScript();
+
+            this.define[name] = {
                 fn: arg1,
                 isOnlyRun: true,
                 url: src
-			};
+            };
         }
+       
  
         return this;
     };
@@ -94,7 +114,7 @@
     window.define.extend({ amd: true });
 
     // 异步并行加载js  全部加载完成再执行函数
-    window.require= include.require = include.all = function () {
+    window.require= include.require  = function () {
 
         if (arguments.length >= 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
             var arg1 = arguments[0];
@@ -128,7 +148,10 @@
             var script = document.createElement("script");
             script.type = "text/javascript";
             script.src = _url;
-            script.setAttribute("data-id", url);
+            var orign = location.protocol+"//" + location.host;
+            var spurl= _url.replace(orign+"/", "");
+            var newurl = orign + "/" + spurl;
+            script.setAttribute("data-src", newurl);
             doc.appendChild(script);
         
             //js加载完成执行方法 ie9+
@@ -139,8 +162,8 @@
                     var itrObj = itr.next();
                     if (itrObj.done) {   
                         include.runIncludeAndCache();
-                       // console.log(_getCaches(arrs));
-                        fn2.apply(null,_getCaches(arrs));
+                        fn2.apply(null, _getCaches(arrs));
+                        // console.log("_getCaches",_getCaches(arrs));
                     }     
                 
                 };
@@ -162,7 +185,6 @@
                     }
                 }
             }
-
         }
                
     // run include.define and  caches
@@ -207,12 +229,15 @@
         var arrs = [];
 
         for (var i = 0; i < list.length; i++) {
-            var o = list[i];
+            var _url = list[i];
+            var orign = location.protocol + "//" + location.host;
+            var spurl = _url.replace(orign+"/", "");
+            var newurl = orign + "/" + spurl;
+            
             for (var y = 0; y < include.caches.length; y++) {
                 var o2 = include.caches[y];
-                if (o === o2.url) {
+                if (newurl === o2.url) {
                     arrs.push(o2.v);
-                   
                     break;
                 }
             }
@@ -224,16 +249,44 @@
 
     // getCurrentScript
     function _getCurrentScript() {
-        if (document.currentScript) {
-            return document.currentScript;
+
+        if (document.currentScript) { 
+
+            return document.currentScript.getAttribute("data-src") || "";
         }
-        var nodes = document.getElementsByTagName("script")//只在head标签中寻找
-        for (var i = 0, node; i < nodes.length; i++) {
-             node = nodes[i];
-            if (node.readyState === "interactive") {
-                return node;
+        else {
+            var stack, e, nodes = document.getElementsByTagName("script");
+            for (var i = 0, node; i < nodes.length; i++) {
+                node = nodes[i];
+                if (node.readyState === "interactive") {
+                    // ie8 ,ie9 ie10
+                    return node.getAttribute("data-src") || "";
+                }
+                else if (!node.readyState) {
+                    // ie11
+                    try {
+                        node.err.err; //强制报错,以便捕获e.stack
+                    } catch (e) {
+                        stack = e.stack;
+                        //console.log("e:", e);
+                    }
+                    if (stack) {
+                        // chrome IE10使用 at, firefox opera 使用 @
+                        e = stack.indexOf(' at ') !== -1 ? ' at ' : '@';
+                        while (stack.indexOf(e) !== -1) {
+                            stack = stack.substring(stack.indexOf(e) + e.length);
+                        }
+                     
+                        return stack.match(/(http|https):\/\/.*\.js/)[0];
+                    }
+                }
             }
         }
+       
+      
+
+       
+
     }
 
     // 遍历器生成函数
