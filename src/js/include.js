@@ -65,12 +65,14 @@
         var arg1 = arguments[0];
       
         // 定义的函数
-        if (typeof arg1 === "function" && arguments.length===1) {
+        if (typeof arg1 === "function" && arguments.length === 1) {
+            var src = _getCurrentScript().getAttribute("src") || "";
+           // console.log("define",src);
             var name = "include_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
 			this.define[name] = {
                 fn: arg1,
                 isOnlyRun: true,
-                name:""
+                url: src
 			};
         }
  
@@ -110,7 +112,7 @@
             }
 
             if (bl) {
-                fn2.apply(null,_getCaches(arg1));
+                fn2.apply(null, _getCaches(arg1));
             }
         }
 
@@ -126,17 +128,18 @@
             var script = document.createElement("script");
             script.type = "text/javascript";
             script.src = _url;
+            script.setAttribute("data-id", url);
             doc.appendChild(script);
-
-
+        
             //js加载完成执行方法 ie9+
             if (window.addEventListener) {
 
                 script.onload = function (e) {
 
                     var itrObj = itr.next();
-                    include.runIncludeAndCache(itrObj.value);
                     if (itrObj.done) {   
+                        include.runIncludeAndCache();
+                       // console.log(_getCaches(arrs));
                         fn2.apply(null,_getCaches(arrs));
                     }     
                 
@@ -150,9 +153,8 @@
                         script.onreadystatechange = function () {
                             
                             var itrObj = itr.next();
-                            include.runIncludeAndCache(itrObj.value);
-                        
                             if (itrObj.done) {
+                                include.runIncludeAndCache();
                                 fn2.apply(null, _getCaches(arrs));
                             }   
                             script.onreadystatechange = null;
@@ -164,22 +166,22 @@
         }
                
     // run include.define and  caches
-    include.runIncludeAndCache = function (url) {
+    include.runIncludeAndCache = function () {
 
         for (var name in include.define) {
 
             var o = include.define[name];
             if (typeof o === "object") {
                 if (typeof o.fn === "function" && o.isOnlyRun === true) {
-
+                 
                     var res= o.fn();
                     o.isOnlyRun = false;
                     include.caches.push({
                         v: res,
-                        url: url
+                        url:o.url
                     });
 
-                    break;
+                   
                 }
             }
         }
@@ -204,23 +206,34 @@
     function _getCaches(list) {
         var arrs = [];
 
-        for (var i = 0; i < include.caches.length; i++) {
-
-            var o = include.caches[i];
-
-            for (var y = 0; y < list.length; y++) {
-                var o2 = list[y];
-                if (o.url === o2) {
-                    arrs.push(o.v);
+        for (var i = 0; i < list.length; i++) {
+            var o = list[i];
+            for (var y = 0; y < include.caches.length; y++) {
+                var o2 = include.caches[y];
+                if (o === o2.url) {
+                    arrs.push(o2.v);
+                   
                     break;
                 }
-
             }
-
         }
 
         return arrs;
 
+    }
+
+    // getCurrentScript
+    function _getCurrentScript() {
+        if (document.currentScript) {
+            return document.currentScript;
+        }
+        var nodes = document.getElementsByTagName("script")//只在head标签中寻找
+        for (var i = 0, node; i < nodes.length; i++) {
+             node = nodes[i];
+            if (node.readyState === "interactive") {
+                return node;
+            }
+        }
     }
 
     // 遍历器生成函数
