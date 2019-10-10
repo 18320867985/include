@@ -42,7 +42,7 @@
     };
 
     // base url;
-    include.base = "";
+    include.baseUrl = "";
     include.urls = [];
     include.caches=[];
 
@@ -144,16 +144,11 @@
 
         var doc = document.body || document.getElementsByTagName('body')[0];
      
-            var _url = include.base + url;
+            var _url = include.baseUrl + url;
             var script = document.createElement("script");
             script.type = "text/javascript";
             script.src = _url;
-            var orign = location.protocol+"//" + location.host;
-            var spurl = _url.replace(orign + "/", "");
-            var reg = /(http|https):\/\//;           
-             // var newurl = orign + "/" + spurl;
-             var  newurl = reg.test(spurl) ? spurl : orign + "/" + spurl;
-            script.setAttribute("data-src", newurl);
+            script.setAttribute("data-src", _url);
             doc.appendChild(script);
         
             //js加载完成执行方法 ie9+
@@ -231,15 +226,11 @@
         var arrs = [];
 
         for (var i = 0; i < list.length; i++) {
-            var _url = list[i];
-            var orign = location.protocol + "//" + location.host;
-            var spurl = _url.replace(orign+"/", "");
-            //var newurl = orign + "/" + spurl;
-            var reg = /(http|https):\/\//;     
-            var newurl = reg.test(spurl) ? spurl : orign + "/" + spurl;
+            var _url = include.baseUrl+list[i];
+         
             for (var y = 0; y < include.caches.length; y++) {
                 var o2 = include.caches[y];
-                if (newurl === o2.url) {
+                if (_url === o2.url) {
                     arrs.push(o2.v);
                     break;
                 }
@@ -279,8 +270,16 @@
                         while (stack.indexOf(e) !== -1) {
                             stack = stack.substring(stack.indexOf(e) + e.length);
                         }
-                     
-                        return stack.match(/(http|https):\/\/.*\.js/)[0];
+                        var mchs = stack.match(/(http|https):\/\/.*\.js/)[0];
+                        mchs = mchs.split("/");
+                        mchs = mchs[mchs.length - 1];
+                        
+                        var mch = mchs.match(/.*\.js$/)[0];
+                       // console.log("mch", mch);
+                        var srp = _getScriptByFileName(mch);
+                        var src=  srp.getAttribute("data-src");
+
+                        return src;
                     }
                 }
             }
@@ -290,6 +289,23 @@
 
        
 
+    }
+
+    // getScriptByFileName
+    function _getScriptByFileName(fileName) {
+        var srps = document.getElementsByTagName("script");
+        var list = [];
+        for (var i = 0; i < srps.length; i++) {
+            var o = srps[i];
+            var reg = new RegExp(fileName, "img");
+            var src = o.getAttribute("src");
+            if (reg.test(src)) {
+                list.push(o);
+
+            }
+        }
+
+        return list.length > 0 ? list[list.length - 1] : {};
     }
 
     // 遍历器生成函数
