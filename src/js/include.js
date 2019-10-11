@@ -29,7 +29,7 @@
     var _include = window.include;
     var _define = window.define;
     var _require = window.require;
-	var include = window.include = function(selector, content) {};
+    var include = window.include = function (selector, content) { };
 
 	include.extend = function(obj) {
 		if (typeof obj === "object") {
@@ -178,15 +178,12 @@
                         script.onreadystatechange = function () {
                             
                             var itrObj = itr.next();
-                          
                             if (itrObj.done) {
                                 include.runIncludeAndCache();
                                 var lst = _getCaches(arrs);
                                 fn2.apply(null, lst);
-                              
-                             
+
                             } 
-                           
                             script.onreadystatechange = null;
                         };
                     }

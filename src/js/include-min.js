@@ -176,13 +176,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     script.onreadystatechange = function () {
 
                         var itrObj = itr.next();
-
                         if (itrObj.done) {
                             include.runIncludeAndCache();
                             var lst = _getCaches(arrs);
                             fn2.apply(null, lst);
                         }
-
                         script.onreadystatechange = null;
                     };
                 }

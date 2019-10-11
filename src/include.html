@@ -52,11 +52,15 @@
         <script src="js/include.js" type="text/javascript" charset="utf-8"></script>
         <script>
 
-          
+            //require(["http://localhost:8888/amd1.js"], function (a) {
+            //    console.log(a)
+     
+
+            //});
                 
             $(function () {
             
-           
+    
                 $("#btn").on("click", function (e) {
               
                     require(["http://localhost:8888/amd1.js","amd2.js","amd3.js","js/amd6.js","http://localhost:8888/js/jquery-1.11.0.js"], function (a,b,c,d,jq) {
