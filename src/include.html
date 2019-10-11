@@ -53,20 +53,16 @@
         <script>
 
           
-            require(["http://localhost:8888/amd1.js"], function (a) {
-
-                console.log(a);
-
-            });
                 
             $(function () {
-
+            
+           
                 $("#btn").on("click", function (e) {
               
                     require(["http://localhost:8888/amd1.js","amd2.js","amd3.js","js/amd6.js","http://localhost:8888/js/jquery-1.11.0.js"], function (a,b,c,d,jq) {
 
-                       //var res = a(12,12)+b(2,2)+c(2,2,2)
-                       //console.log(res);
+                       var res = a(12,12)+b(2,2)+c(2,2,2)
+                       console.log(res);
                        console.log(include.caches)
                        console.log(jq("body").css("background","red"))
                        console.log("done");

@@ -45,6 +45,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     };
 
     // base url;
+    include.fineObjs = {};
     include.baseUrl = "";
     include.urls = [];
     include.caches = [];
@@ -87,7 +88,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         if (arguments.length >= 1) {
             var src = _getCurrentScript();
 
-            this.define[name] = {
+            include.fineObjs[name] = {
                 fn: arg1,
                 isOnlyRun: true,
                 url: src
@@ -121,9 +122,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
             // 遍历器
             var activeUrls = _activeUrls(arg1);
-            console.log("activeUrls", activeUrls);
-            console.log("arg1", arg1);
+
+            // console.log("arg1", arg1);
             var itr = include.iterator(activeUrls);
+
             var bl = true;
             for (var i = 0; i < activeUrls.length; i++) {
                 if (include.ckUrl(activeUrls[i])) {
@@ -159,6 +161,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             script.onload = function (e) {
 
                 var itrObj = itr.next();
+
                 if (itrObj.done) {
                     include.runIncludeAndCache();
                     fn2.apply(null, _getCaches(arrs));
@@ -167,16 +170,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         } else {
 
             // ie8 
-            // console.log(script.readyState);
+            console.log(script.readyState);
             if (script.readyState) {
                 if (script.readyState === "loading" || script.readyState === "loaded" || script.readyState === "complete") {
                     script.onreadystatechange = function () {
 
                         var itrObj = itr.next();
+
                         if (itrObj.done) {
                             include.runIncludeAndCache();
-                            fn2.apply(null, _getCaches(arrs));
+                            var lst = _getCaches(arrs);
+                            fn2.apply(null, lst);
                         }
+
                         script.onreadystatechange = null;
                     };
                 }
@@ -187,9 +193,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     // run include.define and  caches
     include.runIncludeAndCache = function () {
 
-        for (var name in include.define) {
+        for (var name in include.fineObjs) {
 
-            var o = include.define[name];
+            var o = include.fineObjs[name];
             if ((typeof o === "undefined" ? "undefined" : _typeof(o)) === "object") {
                 if (typeof o.fn === "function" && o.isOnlyRun === true) {
 
@@ -207,8 +213,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     // run include.define
     include.runInclude = function () {
 
-        for (var name in include.define) {
-            var o = include.define[name];
+        for (var name in include.fineObjs) {
+            var o = include.fineObjs[name];
 
             if ((typeof o === "undefined" ? "undefined" : _typeof(o)) === "object") {
                 if (typeof o.fn === "function" && o.isOnlyRun === true) {
