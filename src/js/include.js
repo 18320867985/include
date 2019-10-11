@@ -20,6 +20,7 @@
     <li class=""><a href="../matter">物性表</a></li>
     <li class=""><a href="javascript:;">关于我们</a></li>
 </ul>
+
 */
 
 (function() {
@@ -60,7 +61,7 @@
 
     // 定义执行函数
     window.define= include.define = function () {
-
+       
         var arg1;
       
         // 定义的函数
@@ -68,21 +69,18 @@
         if (arguments.length === 1 && typeof arguments[0] === "function") {
             
                arg1 = arguments[0];
-
         }
 
         if (arguments.length === 2 && arguments[0] instanceof Array && typeof arguments[1] === "function") {
 
             arg1 = arguments[1];
-
         }
 
+        // 兼容jquery
         if (arguments.length === 3 && typeof arguments[0] === "string" && arguments[1] instanceof Array && typeof arguments[2] === "function") {
 
             arg1 = arguments[2];
-
         }
-
 
         if (arguments.length >= 1) {
             var src = _getCurrentScript();
@@ -100,6 +98,7 @@
 
     // amd module extend
     window.define.extend = function (obj) {
+
         if (typeof obj === "object") {
             for (var i in obj) {
                 this[i] = obj[i];
@@ -120,12 +119,15 @@
             var fn2 = arguments[1];
 
             // 遍历器
-            var itr = include.iterator(arg1);
+            var activeUrls = _activeUrls(arg1);
+            console.log("activeUrls", activeUrls);
+            console.log("arg1", arg1);
+            var itr = include.iterator(activeUrls);
             var bl = true;
-            for (var i = 0; i < arg1.length; i++) {
-                if (include.ckUrl(arg1[i])) {
-                    include.urls.push(arg1[i]);
-                    _addAllIterator(itr, fn2, arg1[i], arg1);
+            for (var i = 0; i < activeUrls.length; i++) {
+                if (include.ckUrl(activeUrls[i])) {
+                    include.urls.push(activeUrls[i]);
+                    _addAllIterator(itr, fn2, activeUrls[i], arg1);
                     bl = false;
                 }
             }
@@ -159,7 +161,6 @@
                     if (itrObj.done) {   
                         include.runIncludeAndCache();
                         fn2.apply(null, _getCaches(arrs));
-                        // console.log("_getCaches",_getCaches(arrs));
                     }     
                 
                 };
@@ -240,6 +241,28 @@
 
     }
 
+    // 激活activeUrls
+    function _activeUrls(list) {
+        var arrs = [];
+        for (var i = 0; i < list.length; i++) {
+            var _url =  list[i];
+
+            var bl = true;
+            for (var y = 0; y < include.urls.length; y++) {
+                var _url2 = include.urls[y];
+                if (_url === _url2) {
+                    bl = false;
+                }
+            }
+
+            if (bl) {
+                arrs.push(_url);
+            }         
+        }
+
+        return arrs;
+    }
+
     // getCurrentScript
     function _getCurrentScript() {
 
@@ -248,7 +271,7 @@
             return document.currentScript.getAttribute("data-src") || "";
         }
         else {
-            var stack, e, nodes = document.getElementsByTagName("script");
+            var stack, e, saf, nodes = document.getElementsByTagName("script");
             for (var i = 0, node; i < nodes.length; i++) {
                 node = nodes[i];
                 if (node.readyState === "interactive") {
@@ -256,30 +279,36 @@
                     return node.getAttribute("data-src") || "";
                 }
                 else if (!node.readyState) {
+
                     // ie11
                     try {
-                        node.err.err; //强制报错,以便捕获e.stack
+                        throw Error("强制报错,以便捕获e.stack,获取JS路径有误");
+
                     } catch (e) {
                         stack = e.stack;
-                        //console.log("e:", e);
+                      
+                        if (e.sourceURL) {
+                        //safari
+                            saf = e.sourceURL;
+                        }
                     }
                     if (stack) {
-                        // chrome IE10使用 at, firefox opera 使用 @
+                       
                         e = stack.indexOf(' at ') !== -1 ? ' at ' : '@';
                         while (stack.indexOf(e) !== -1) {
                             stack = stack.substring(stack.indexOf(e) + e.length);
                         }
+           
                         var mchs = stack.match(/(http|https):\/\/.*\.js/)[0];
                         mchs = mchs.split("/");
                         mchs = mchs[mchs.length - 1];
-                        
                         var mch = mchs.match(/.*\.js$/)[0];
-                       // console.log("mch", mch);
                         var srp = _getScriptByFileName(mch);
                         var src=  srp.getAttribute("data-src");
-
                         return src;
                     }
+
+                    
                 }
             }
         }
